@@ -14,8 +14,9 @@ import store from './store'
 import router from './router'
 
 import './icons' // icon
-import './permission' // permission control
+// import './permission' // permission control
 import './utils/error-log' // error log
+import { FUNCTIONS } from './utils/merry-codes'
 
 import * as filters from './filters' // global filters
 
@@ -31,6 +32,8 @@ if (process.env.NODE_ENV === 'production') {
   const { mockXHR } = require('../mock')
   mockXHR()
 }
+
+Vue.prototype.$util = FUNCTIONS
 
 Vue.use(Element, {
   size: Cookies.get('size') || 'medium' // set element-ui default size

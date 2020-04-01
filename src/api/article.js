@@ -1,13 +1,20 @@
 import request from '@/utils/request'
+import qs from 'qs'
 
 export function fetchList(query) {
+  // return request({
+  //   url: '/vue-element-admin/article/list',
+  //   method: 'get',
+  //   params: query
+  // })
+}
+export function saveArticle(data) {
   return request({
-    url: '/vue-element-admin/article/list',
-    method: 'get',
-    params: query
+    url: '/article/save',
+    method: 'post',
+    data: qs.stringify(data)
   })
 }
-
 // export function fetchArticle(id) {
 //   return request({
 //     url: '/vue-element-admin/article/detail',
