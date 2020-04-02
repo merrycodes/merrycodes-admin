@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <el-form :ref="blogForm" :model="blogForm" :rules="rules" label-position="top">
+    <el-form ref="blogForm" :model="blogForm" :rules="rules" label-position="top">
       <div class="createPost-main-container">
         <el-row>
           <el-col :span="24">
@@ -62,6 +62,7 @@
           <template slot="right-toolbar-before">
             <button type="button" class="op-icon fa fa-upload" aria-hidden="true" :title="`导入md`" @click="$refs.importMd.click()" />
             <button type="button" class="op-icon fa fa-download" aria-hidden="true" :title="`导出md`" @click="saveMd" />
+            <button type="button" class="op-icon fa fa-file-powerpoint-o" aria-hidden="true" :title="`添加预览标签`" @click="addSummary" />
             <input ref="importMd" style="display : none" type="file" accept=".md" @change="importMd($event)">
           </template>
         </mavon-editor>
@@ -195,7 +196,7 @@ export default {
       const reader = new FileReader()
       // 文件内容载入完毕之后的回调。
       reader.onload = e => {
-        this.value = e.target.result
+        this.blogForm.mdContent = e.target.result
       }
       reader.readAsText(selectedFile)
     },
@@ -209,6 +210,7 @@ export default {
       e.preventDefault()
       // 拖动md文件导入
       var dt = e.dataTransfer.files[0]
+      console.log(dt)
       const fileName = dt.name
       if (fileName.substring(fileName.lastIndexOf('.')) !== '.md') {
         this.$util.notification.error('请导入md文件')
@@ -217,9 +219,12 @@ export default {
       const reader = new FileReader()
       // 文件内容载入完毕之后的回调。
       reader.onload = e => {
-        this.value = e.target.result
+        this.blogForm.mdContent = e.target.result
       }
       reader.readAsText(dt)
+    },
+    addSummary() {
+      this.blogForm.mdContent += '<!-- read more -->'
     },
     mdScreenChange(e) {
       this.zIndex = e
@@ -231,7 +236,7 @@ export default {
     // 发布文章
     onRelease() {
       const _this = this
-      this.submitArticle('blogForm', function() {
+      this.submitArticle('blogForm', function(data) {
         _this.$util.notification.success('文章发布成功！')
         // todo 跳转到列表文章页面
       })
@@ -239,23 +244,33 @@ export default {
     // 保存文章
     onSave() {
       const _this = this
-      this.submitArticle('blogForm', function() {
+      this.submitArticle('blogForm', function(data) {
         _this.$util.notification.success('保存文章成功！')
         // todo 跳转到列表文章页面
       })
     },
-    submitArticle(formNmae, action) {
+    submitArticle(formName, action) {
       if (this.submitting) {
         this.$util.notification.error('请不要提交过快!')
         return
       }
-      this.$$refs[formNmae].validate(valid => {
+      this.$refs[formName].validate(valid => {
         if (valid) {
           this.submitting = true
-          this.blogForm.tags = this.blogForm.tags.join()
-          saveArticle(this.blogForm).then(response => {
-            console.log(response)
-          })
+          // 标签转换成字符串
+          console.log(this.blogForm.tags)
+          this.blogForm.tags = this.articleTag.join()
+          this.blogForm.summaryContent = this.$util.getSummary(this.blogForm.htmlContent)
+          console.log(this.blogForm.summaryContent)
+          saveArticle(this.blogForm)
+            .then(response => {
+              action(response.data)
+              this.submitting = false
+            })
+            .catch(err => {
+              console.log(err)
+              this.submitting = false
+            })
         }
       })
     }
