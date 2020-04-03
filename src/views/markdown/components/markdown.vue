@@ -72,7 +72,7 @@
 </template>
 
 <script>
-import { saveArticle } from '@/api/article'
+import { saveArticle, getArticle } from '@/api/article'
 import { mavonEditor } from 'mavon-editor'
 import MDinput from '@/components/MDinput'
 import 'mavon-editor/dist/css/index.css'
@@ -108,6 +108,7 @@ export default {
         mdContent: '',
         summaryContent: ''
       },
+      tempRoute: {},
       // 简单得表单验证
       rules: {
         title: {
@@ -154,6 +155,18 @@ export default {
         }
       ]
     }
+  },
+  created() {
+    if (this.isEdit) {
+      const id = this.$route.params && this.$route.params.id
+      console.log(id)
+      this.fetchArticle(id)
+    }
+
+    // Why need to make a copy of this.$route here?
+    // Because if you enter this page and quickly switch tag, may be in the execution of the setTagsViewTitle function, this.$route is no longer pointing to the current page
+    // https://github.com/PanJiaChen/vue-element-admin/issues/1221
+    this.tempRoute = Object.assign({}, this.$route)
   },
   mounted() {
     const md = document.getElementById('md')
@@ -236,6 +249,7 @@ export default {
     // 发布文章
     onRelease() {
       const _this = this
+      this.blogForm.status = this.blogForm.status !== 1 ? 1 : this.blogForm.status
       this.submitArticle('blogForm', function(data) {
         _this.$util.notification.success('文章发布成功！')
         // todo 跳转到列表文章页面
@@ -249,6 +263,7 @@ export default {
         // todo 跳转到列表文章页面
       })
     },
+    // 提交
     submitArticle(formName, action) {
       if (this.submitting) {
         this.$util.notification.error('请不要提交过快!')
@@ -273,6 +288,34 @@ export default {
             })
         }
       })
+    },
+    // 获取文章详情
+    fetchArticle(id) {
+      getArticle(id)
+        .then(res => {
+          this.blogForm = res.data
+          this.articleTag = res.data.tags.split(',')
+          console.log(this.blogForm)
+          // set tagsview title
+          this.setTagsViewTitle()
+
+          // set page title
+          this.setPageTitle()
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    },
+    setTagsViewTitle() {
+      const title = '编辑文章'
+      const route = Object.assign({}, this.tempRoute, {
+        title: `${title}-${this.blogForm.id}`
+      })
+      this.$store.dispatch('tagsView/updateVisitedView', route)
+    },
+    setPageTitle() {
+      const title = '编辑文章'
+      document.title = `${title} - ${this.blogForm.id}`
     }
   }
 }

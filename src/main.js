@@ -14,7 +14,7 @@ import store from './store'
 import router from './router'
 
 import './icons' // icon
-// import './permission' // permission control
+import './permission' // permission control
 import './utils/error-log' // error log
 import { FUNCTIONS } from './utils/merry-codes'
 

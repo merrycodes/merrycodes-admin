@@ -1,5 +1,4 @@
 import request from '@/utils/request'
-import qs from 'qs'
 
 export function fetchList(query) {
   // return request({
@@ -12,7 +11,14 @@ export function saveArticle(data) {
   return request({
     url: '/article/save',
     method: 'post',
-    data: qs.stringify(data)
+    data: data
+  })
+}
+
+export function getArticle(data) {
+  return request({
+    url: '/article/' + data,
+    method: 'get'
   })
 }
 // export function fetchArticle(id) {

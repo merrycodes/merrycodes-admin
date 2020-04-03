@@ -1,4 +1,5 @@
 import axios from 'axios'
+import qs from 'qs'
 import { MessageBox, Message } from 'element-ui'
 import store from '@/store'
 import { getToken } from '@/utils/auth'
@@ -9,7 +10,18 @@ const service = axios.create({
   withCredentials: true,
   // baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
   // withCredentials: true, // send cookies when cross-domain requests
-  timeout: 5000 // request timeout
+  timeout: 5000, // request timeout
+  transformRequest: [
+    data => {
+      // 序列化参数数组时不设置索引，否则tomcat8.5以上无法接收特殊字符
+      return qs.stringify(data, { indices: false })
+    }
+  ],
+  // 序列化params参数
+  paramsSerializer: params => {
+    // 序列化参数数组时不设置索引，否则tomcat8.5以上无法接收特殊字符
+    return qs.stringify(params, { indices: false })
+  }
 })
 
 // request interceptor
