@@ -21,6 +21,14 @@ export function getArticle(data) {
     method: 'get'
   })
 }
+
+export function getArticleList(data) {
+  return request({
+    url: '/article',
+    method: 'get',
+    params: data
+  })
+}
 // export function fetchArticle(id) {
 //   return request({
 //     url: '/vue-element-admin/article/detail',

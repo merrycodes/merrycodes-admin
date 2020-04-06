@@ -79,19 +79,19 @@ export const constantRoutes = [
       {
         path: 'aritcle',
         component: () => import('@/views/article-list/index'),
-        name: 'Aritcle',
+        name: 'ArticleList',
         meta: { title: '文章列表', icon: 'article', affix: true }
       },
       {
         path: 'tag',
         component: () => import('@/views/tag-list/index'),
-        name: 'Tag',
+        name: 'TagList',
         meta: { title: '标签列表', icon: 'tag' }
       },
       {
         path: 'category',
         component: () => import('@/views/category-list/index'),
-        name: 'Category',
+        name: 'CategoryList',
         meta: { title: '分类列表', icon: 'category' }
       },
       {

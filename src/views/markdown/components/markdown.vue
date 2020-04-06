@@ -5,23 +5,40 @@
         <el-row>
           <el-col :span="24">
             <el-form-item style="margin-bottom: 40px;" prop="title">
-              <MDinput v-model="blogForm.title" :maxlength="100">
-                标题
-              </MDinput>
+              <MDinput v-model="blogForm.title" :maxlength="100">标题</MDinput>
             </el-form-item>
 
             <div class="postInfo-container">
               <el-row>
                 <el-col :span="12">
-                  <el-form-item label-width="120px" label="分类:" class="postInfo-container-item" prop="category">
-                    <el-select v-model="blogForm.category" filterable default-first-option clearable :popper-append-to-body="false" popper-class="z-index-9" style="width:500px;" placeholder="请选择">
+                  <el-form-item
+                    label-width="120px"
+                    label="分类:"
+                    class="postInfo-container-item"
+                    prop="category"
+                  >
+                    <el-select
+                      v-model="blogForm.category"
+                      filterable
+                      default-first-option
+                      clearable
+                      :popper-append-to-body="false"
+                      popper-class="z-index-9"
+                      style="width:500px;"
+                      placeholder="请选择"
+                    >
                       <el-option v-for="item in options" :key="item.value" :value="item.value" />
                     </el-select>
                   </el-form-item>
                 </el-col>
 
                 <el-col :span="12">
-                  <el-form-item label-width="120px" label="标签:" class="postInfo-container-item" prop="tags">
+                  <el-form-item
+                    label-width="120px"
+                    label="标签:"
+                    class="postInfo-container-item"
+                    prop="tags"
+                  >
                     <el-select
                       v-model="articleTag"
                       filterable
@@ -57,13 +74,43 @@
           @fullScreen="mdScreenChange"
         >
           <template slot="left-toolbar-after">
-            <button type="button" class="op-icon fa fa-paper-plane" aria-hidden="true" :title="`发布文章`" @click="onRelease" />
+            <button
+              type="button"
+              class="op-icon fa fa-paper-plane"
+              aria-hidden="true"
+              :title="`发布文章`"
+              @click="onRelease"
+            />
           </template>
           <template slot="right-toolbar-before">
-            <button type="button" class="op-icon fa fa-upload" aria-hidden="true" :title="`导入md`" @click="$refs.importMd.click()" />
-            <button type="button" class="op-icon fa fa-download" aria-hidden="true" :title="`导出md`" @click="saveMd" />
-            <button type="button" class="op-icon fa fa-file-powerpoint-o" aria-hidden="true" :title="`添加预览标签`" @click="addSummary" />
-            <input ref="importMd" style="display : none" type="file" accept=".md" @change="importMd($event)">
+            <button
+              type="button"
+              class="op-icon fa fa-upload"
+              aria-hidden="true"
+              :title="`导入md`"
+              @click="$refs.importMd.click()"
+            />
+            <button
+              type="button"
+              class="op-icon fa fa-download"
+              aria-hidden="true"
+              :title="`导出md`"
+              @click="saveMd"
+            />
+            <button
+              type="button"
+              class="op-icon fa fa-file-powerpoint-o"
+              aria-hidden="true"
+              :title="`添加预览标签`"
+              @click="addSummary"
+            />
+            <input
+              ref="importMd"
+              style="display : none"
+              type="file"
+              accept=".md"
+              @change="importMd($event)"
+            >
           </template>
         </mavon-editor>
       </el-form-item>
@@ -162,10 +209,6 @@ export default {
       console.log(id)
       this.fetchArticle(id)
     }
-
-    // Why need to make a copy of this.$route here?
-    // Because if you enter this page and quickly switch tag, may be in the execution of the setTagsViewTitle function, this.$route is no longer pointing to the current page
-    // https://github.com/PanJiaChen/vue-element-admin/issues/1221
     this.tempRoute = Object.assign({}, this.$route)
   },
   mounted() {

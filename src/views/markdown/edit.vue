@@ -5,6 +5,7 @@
 <script>
 import markdown from './components/markdown'
 export default {
+  name: 'EditArticle',
   components: {
     markdown
   }
