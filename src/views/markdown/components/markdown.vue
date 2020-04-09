@@ -206,7 +206,6 @@ export default {
   created() {
     if (this.isEdit) {
       const id = this.$route.params && this.$route.params.id
-      console.log(id)
       this.fetchArticle(id)
     }
     this.tempRoute = Object.assign({}, this.$route)
@@ -266,7 +265,6 @@ export default {
       e.preventDefault()
       // 拖动md文件导入
       var dt = e.dataTransfer.files[0]
-      console.log(dt)
       const fileName = dt.name
       if (fileName.substring(fileName.lastIndexOf('.')) !== '.md') {
         this.$util.notification.error('请导入md文件')
@@ -296,14 +294,20 @@ export default {
       this.submitArticle('blogForm', function(data) {
         _this.$util.notification.success('文章发布成功！')
         // todo 跳转到列表文章页面
+        _this.$router.push({ path: '/aritcle' })
+        _this.$store.dispatch('constant/updateReload', true)
       })
     },
     // 保存文章
     onSave() {
       const _this = this
+      const status = this.blogForm.status
+      this.blogForm.status = typeof status === 'number' ? status : 0
       this.submitArticle('blogForm', function(data) {
         _this.$util.notification.success('保存文章成功！')
         // todo 跳转到列表文章页面
+        _this.$router.push({ path: '/aritcle' })
+        _this.$store.dispatch('constant/updateReload', true)
       })
     },
     // 提交
@@ -316,10 +320,8 @@ export default {
         if (valid) {
           this.submitting = true
           // 标签转换成字符串
-          console.log(this.blogForm.tags)
           this.blogForm.tags = this.articleTag.join()
           this.blogForm.summaryContent = this.$util.getSummary(this.blogForm.htmlContent)
-          console.log(this.blogForm.summaryContent)
           saveArticle(this.blogForm)
             .then(response => {
               action(response.data)
@@ -338,7 +340,6 @@ export default {
         .then(res => {
           this.blogForm = res.data
           this.articleTag = res.data.tags.split(',')
-          console.log(this.blogForm)
           // set tagsview title
           this.setTagsViewTitle()
 

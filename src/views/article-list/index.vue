@@ -87,7 +87,7 @@
     </div>
 
     <!-- 表格 -->
-    <el-table :key="tableKey" v-loading="listLoading" :data="list" border fit style="width: 100%;">
+    <el-table v-loading="listLoading" :data="list" border fit style="width: 100%;">
       <!-- id -->
       <el-table-column label="ID" prop="id" align="center" width="50">
         <template slot-scope="{ row }">
@@ -95,18 +95,19 @@
         </template>
       </el-table-column>
       <!-- 标题 -->
-      <el-table-column label="标题" min-width="150px">
+      <el-table-column label="标题" min-width="150">
         <template slot-scope="{ row }">
           <span class="link-type">{{ row.title }}</span>
         </template>
       </el-table-column>
       <!-- 分类 -->
-      <el-table-column label="分类" width="150px" align="center">
+      <el-table-column label="分类" width="150" align="center">
         <template slot-scope="{ row }">
           <el-tag effect="plain">{{ row.category }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="标签" align="center">
+      <!-- 标签 -->
+      <el-table-column label="标签" width="160" align="center">
         <template slot-scope="{ row }">
           <el-tag
             v-for="item in row.tags.split(',')"
@@ -116,25 +117,26 @@
           >{{ item }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="状态" class-name="status-col" width="80">
+      <!-- 状态 -->
+      <el-table-column label="状态" class-name="status-col" width="90">
         <template slot-scope="{ row }">
           <el-tag :type="row.status | statusFilter">{{ row.status | statusNameFilter }}</el-tag>
         </template>
       </el-table-column>
       <!-- 时间 -->
-      <el-table-column label="发布时间" width="150px" align="center">
+      <el-table-column label="发布时间" width="140" align="center">
         <template slot-scope="{ row }">
           <span>{{ row.createTime }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="修改时间" width="150px" align="center">
+      <el-table-column label="修改时间" width="140" align="center">
         <template slot-scope="{ row }">
           <span>{{ row.updateTime }}</span>
         </template>
       </el-table-column>//
       <el-table-column
         label="操作"
-        width="210"
+        width="195"
         style="text-align:center"
         class-name="small-padding fixed-width"
       >
@@ -152,8 +154,15 @@
             size="small"
             icon="el-icon-s-promotion"
             type="success"
+            @click="onRelease(row.id)"
           >发布</el-button>
-          <el-button v-if="row.status == '1'" size="small" icon="el-icon-delete" type="danger">取消发布</el-button>
+          <el-button
+            v-if="row.status == '1'"
+            size="small"
+            icon="el-icon-delete"
+            type="danger"
+            @click="onUnRelease(row.id)"
+          >取消发布</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -169,7 +178,7 @@
 </template>
 
 <script>
-import { getArticleList } from '@/api/article'
+import { getArticleList, saveArticle } from '@/api/article'
 import waves from '@/directive/waves' // waves directive
 // eslint-disable-next-line no-unused-vars
 import { parseTime } from '@/utils'
@@ -199,7 +208,7 @@ export default {
   },
   data() {
     return {
-      tableKey: 0,
+      reload: false,
       list: null,
       total: 0,
       listLoading: true,
@@ -208,7 +217,7 @@ export default {
         size: 10,
         title: undefined,
         status: undefined,
-        sort: undefined,
+        sort: 'asc',
         tags: undefined,
         category: undefined,
         mdContent: undefined
@@ -226,7 +235,22 @@ export default {
           key: 2,
           value: '取消发布'
         }
-      ]
+      ],
+      updateParam: {
+        id: undefined,
+        status: undefined
+      }
+    }
+  },
+  watch: {
+    '$store.getters.reloadStatus'() {
+      this.reload = this.$store.getters.reloadStatus
+    },
+    reload() {
+      if (this.reload) {
+        this.getList()
+        this.$store.dispatch('constant/updateReload', false)
+      }
     }
   },
   created() {
@@ -246,6 +270,33 @@ export default {
     handleFilter() {
       this.listQuery.current = 1
       this.getList()
+    },
+    onRelease(id) {
+      const _this = this
+      this.updateParam.id = id
+      this.updateParam.status = this.status[1].key
+      this.updateArticle(this.updateParam, function() {
+        _this.$util.notification.success('文章发布成功！')
+        _this.handleFilter()
+      })
+    },
+    onUnRelease(id) {
+      const _this = this
+      this.updateParam.id = id
+      this.updateParam.status = this.status[2].key
+      this.updateArticle(this.updateParam, function() {
+        _this.$util.notification.success('文章取消发布成功！')
+        _this.handleFilter()
+      })
+    },
+    updateArticle(data, action) {
+      saveArticle(data)
+        .then(response => {
+          action()
+        })
+        .catch(err => {
+          console.log(err)
+        })
     }
   }
 }
