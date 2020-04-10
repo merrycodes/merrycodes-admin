@@ -87,7 +87,16 @@
     </div>
 
     <!-- 表格 -->
-    <el-table v-loading="listLoading" :data="list" border fit style="width: 100%;">
+    <el-table
+      ref="table"
+      v-loading="listLoading"
+      :data="list"
+      border
+      fit
+      style="width: 100%;"
+      :default-sort="{prop: 'updateTime', order: 'descending'}"
+      @sort-change="sortChange"
+    >
       <!-- id -->
       <el-table-column label="ID" prop="id" align="center" width="50">
         <template slot-scope="{ row }">
@@ -124,12 +133,12 @@
         </template>
       </el-table-column>
       <!-- 时间 -->
-      <el-table-column label="发布时间" width="140" align="center">
+      <el-table-column label="发布时间" sortable prop="createTime" width="140" align="center">
         <template slot-scope="{ row }">
           <span>{{ row.createTime }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="修改时间" width="140" align="center">
+      <el-table-column label="修改时间" sortable="custom" prop="updateTime" width="140" align="center">
         <template slot-scope="{ row }">
           <span>{{ row.updateTime }}</span>
         </template>
@@ -217,7 +226,10 @@ export default {
         size: 10,
         title: undefined,
         status: undefined,
-        sort: 'asc',
+        sort: {
+          name: 'update',
+          sort: 'desc'
+        },
         tags: undefined,
         category: undefined,
         mdContent: undefined
@@ -297,6 +309,23 @@ export default {
         .catch(err => {
           console.log(err)
         })
+    },
+    // 按着 创建时间 / 更新时间 排序
+    sortChange(column) {
+      if (column.order == null) return
+      if (column.prop === 'updateTime') {
+        this.listQuery.sort = {
+          name: 'update',
+          sort: column.order === 'ascending' ? 'asc' : 'desc'
+        }
+        this.getList()
+      } else {
+        this.listQuery.sort = {
+          name: 'create',
+          sort: column.order === 'ascending' ? 'asc' : 'desc'
+        }
+        this.getList()
+      }
     }
   }
 }
