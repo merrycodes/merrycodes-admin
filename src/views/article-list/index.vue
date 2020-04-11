@@ -94,7 +94,6 @@
       border
       fit
       style="width: 100%;"
-      :default-sort="{prop: 'updateTime', order: 'descending'}"
       @sort-change="sortChange"
     >
       <!-- id -->
@@ -276,7 +275,7 @@ export default {
         this.total = res.data.total
         setTimeout(() => {
           this.listLoading = false
-        }, 1.5 * 1000)
+        }, 0.8 * 1000)
       })
     },
     handleFilter() {
@@ -287,7 +286,7 @@ export default {
       const _this = this
       this.updateParam.id = id
       this.updateParam.status = this.status[1].key
-      this.updateArticle(this.updateParam, function() {
+      this.submitArticle(this.updateParam, function() {
         _this.$util.notification.success('文章发布成功！')
         _this.handleFilter()
       })
@@ -296,12 +295,12 @@ export default {
       const _this = this
       this.updateParam.id = id
       this.updateParam.status = this.status[2].key
-      this.updateArticle(this.updateParam, function() {
+      this.submitArticle(this.updateParam, function() {
         _this.$util.notification.success('文章取消发布成功！')
         _this.handleFilter()
       })
     },
-    updateArticle(data, action) {
+    submitArticle(data, action) {
       saveArticle(data)
         .then(response => {
           action()
