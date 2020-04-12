@@ -6,7 +6,13 @@
         class="el-col el-col-24 el-col-xs-24 el-col-sm-24 el-col-md-12 el-col-lg-3"
         style="margin-left: 10px;"
       >
-        <el-select v-model="listQuery.status" placeholder="标签状态" clearable class="filter-item">
+        <el-select
+          v-model="listQuery.status"
+          placeholder="标签状态"
+          clearable
+          class="filtchanger-item"
+          @change="handleFilter"
+        >
           <el-option v-for="item in status" :key="item.key" :label="item.value" :value="item.key" />
         </el-select>
       </div>
@@ -17,9 +23,10 @@
         style="margin-left: 10px;"
       >
         <el-input
-          v-model="listQuery.title"
+          v-model="listQuery.name"
           placeholder="搜索标签"
           class="filter-item"
+          clearable
           @keyup.enter.native="handleFilter"
         />
       </div>
@@ -59,6 +66,7 @@
       border
       fit
       style="width: 100%;"
+      :default-sort="{prop: 'count', order: 'descending'}"
       @sort-change="sortChange"
     >
       <!-- id -->
@@ -80,20 +88,20 @@
         </template>
       </el-table-column>
       <!-- 文章数 -->
-      <el-table-column label="文章数" class-name="status-col">
+      <el-table-column sortable="custom" prop="count" label="文章数" class-name="status-col">
         <template slot-scope="{ row }">
           <span>{{ row.count }}</span>
         </template>
       </el-table-column>
       <!-- 时间 -->
-      <el-table-column label="发布时间" align="center">
+      <el-table-column sortable="custom" prop="createTime" label="发布时间" align="center">
         <template slot-scope="{ row }">
           <span>{{ row.createTime }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="修改时间" align="center">
+      <el-table-column sortable="custom" prop="updateTime" label="修改时间" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.createTime }}</span>
+          <span>{{ row.updateTime }}</span>
         </template>
       </el-table-column>
       <el-table-column
@@ -103,7 +111,6 @@
         class-name="small-padding fixed-width operation"
       >
         <template slot-scope="{ row }">
-          <!-- { row, $index } -->
           <el-button
             style="margin-left:5px;"
             size="small"
@@ -116,8 +123,15 @@
             size="small"
             icon="el-icon-s-promotion"
             type="success"
+            @click="onValid(row.id)"
           >生效</el-button>
-          <el-button v-if="row.status != '0'" size="small" icon="el-icon-delete" type="danger">失效</el-button>
+          <el-button
+            v-if="row.status != '0'"
+            size="small"
+            icon="el-icon-delete"
+            type="danger"
+            @click="onInvalid(row.id)"
+          >失效</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -134,10 +148,10 @@
 
 <script>
 import { getTagsList, saveTags } from '@/api/tags'
-import waves from '@/directive/waves' // waves directive
+import waves from '@/directive/waves'
 // eslint-disable-next-line no-unused-vars
 import { parseTime } from '@/utils'
-import Pagination from '@/components/Pagination' // secondary package based on el-pagination
+import Pagination from '@/components/Pagination'
 
 export default {
   name: 'TagList',
@@ -168,12 +182,11 @@ export default {
         current: 1,
         size: 10,
         status: undefined,
-        name: undefined
-        // ,
-        // sort: {
-        //   name: 'update',
-        //   sort: 'desc'
-        // }
+        name: undefined,
+        sort: {
+          name: 'update',
+          sort: 'desc'
+        }
       },
       status: [
         {
@@ -196,22 +209,49 @@ export default {
     this.getList()
   },
   methods: {
-    tagsPrompt() {},
+    // 获取文章标签列表
     getList() {
       this.listLoading = true
-      getTagsList(this.listQuery).then(res => {
-        this.list = res.data.list
-        this.total = res.data.total
-        setTimeout(() => {
+      getTagsList(this.listQuery)
+        .then(res => {
+          this.list = res.data.list
+          this.total = res.data.total
+          setTimeout(() => {
+            this.listLoading = false
+          }, 0.8 * 1000)
+        })
+        .catch(() => {
           this.listLoading = false
-        }, 0.8 * 1000)
-      })
+        })
     },
     handleFilter() {
       this.listQuery.page = 1
       this.getList()
     },
-    sortChange(column) {},
+    // 排序
+    sortChange(column) {
+      if (column.order == null) return
+      if (column.prop === 'updateTime') {
+        this.listQuery.sort = {
+          name: 'update',
+          sort: column.order === 'ascending' ? 'asc' : 'desc'
+        }
+        this.getList()
+      } else if (column.prop === 'createTime') {
+        this.listQuery.sort = {
+          name: 'create',
+          sort: column.order === 'ascending' ? 'asc' : 'desc'
+        }
+        this.getList()
+      } else {
+        this.listQuery.sort = {
+          name: 'count',
+          sort: column.order === 'ascending' ? 'asc' : 'desc'
+        }
+        this.getList()
+      }
+    },
+    // save / update 共用方法
     submitTags(data, action) {
       saveTags(data)
         .then(res => {
@@ -221,6 +261,7 @@ export default {
           console.log(err)
         })
     },
+    // 创建文章标签
     onCreate() {
       this.$prompt('请输入标签名称', '创建文章标签', {
         confirmButtonText: '创建',
@@ -232,9 +273,10 @@ export default {
           const _this = this
           _this.tagsForm.id = undefined
           _this.tagsForm.name = value
+          _this.tagsForm.status = undefined
           this.submitTags(this.tagsForm, function() {
             _this.$util.notification.success('创建文章标签成功')
-            _this.getList()
+            _this.handleFilter()
           })
         })
         .catch(err => {
@@ -242,6 +284,7 @@ export default {
           this.$util.notification.info('取消创建')
         })
     },
+    // 修改文章标签
     onSave(id) {
       this.$prompt('请输入标签名称', '修改文章标签', {
         confirmButtonText: '修改',
@@ -253,6 +296,7 @@ export default {
           const _this = this
           _this.tagsForm.id = id
           _this.tagsForm.name = value
+          _this.tagsForm.status = undefined
           this.submitTags(this.tagsForm, function() {
             _this.$util.notification.success('修改成功文章标签成功')
             _this.getList()
@@ -262,6 +306,28 @@ export default {
           console.log(err)
           this.$util.notification.info('取消修改')
         })
+    },
+    // 生效文章标签
+    onValid(id) {
+      const _this = this
+      _this.tagsForm.id = id
+      _this.tagsForm.name = undefined
+      _this.tagsForm.status = this.status[1].key
+      _this.submitTags(this.tagsForm, function() {
+        _this.$util.notification.success('文章标签生效成功')
+        _this.getList()
+      })
+    },
+    // 失效文章标签
+    onInvalid(id) {
+      const _this = this
+      _this.tagsForm.id = id
+      _this.tagsForm.name = undefined
+      _this.tagsForm.status = this.status[0].key
+      _this.submitTags(this.tagsForm, function() {
+        _this.$util.notification.success('文章标签失效成功')
+        _this.getList()
+      })
     }
   }
 }

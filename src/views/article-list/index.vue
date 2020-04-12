@@ -6,7 +6,13 @@
         class="el-col el-col-24 el-col-xs-24 el-col-sm-24 el-col-md-12 el-col-lg-3"
         style="margin-left: 10px;"
       >
-        <el-select v-model="listQuery.status" placeholder="文章状态" clearable class="filter-item">
+        <el-select
+          v-model="listQuery.status"
+          placeholder="文章状态"
+          clearable
+          class="filter-item"
+          @change="handleFilter"
+        >
           <el-option v-for="item in status" :key="item.key" :label="item.value" :value="item.key" />
         </el-select>
       </div>
@@ -23,6 +29,7 @@
           default-first-option
           clearable
           class="filter-item"
+          @change="handleFilter"
         >
           <el-option v-for="item in status" :key="item.key" :label="item.value" :value="item.key" />
         </el-select>
@@ -40,6 +47,7 @@
           default-first-option
           clearable
           class="filter-item"
+          @change="handleFilter"
         >
           <el-option v-for="item in status" :key="item.key" :label="item.value" :value="item.key" />
         </el-select>
@@ -54,6 +62,7 @@
           v-model="listQuery.title"
           placeholder="搜索文章标题"
           class="filter-item"
+          clearable
           @keyup.enter.native="handleFilter"
         />
       </div>
@@ -67,6 +76,7 @@
           v-model="listQuery.mdContent"
           placeholder="搜索文章内容"
           class="filter-item"
+          clearable
           @keyup.enter.native="handleFilter"
         />
       </div>
@@ -94,6 +104,7 @@
       border
       fit
       style="width: 100%;"
+      :default-sort="{prop: 'updateTime', order: 'descending'}"
       @sort-change="sortChange"
     >
       <!-- id -->
@@ -132,7 +143,7 @@
         </template>
       </el-table-column>
       <!-- 时间 -->
-      <el-table-column label="发布时间" sortable prop="createTime" width="140" align="center">
+      <el-table-column label="发布时间" sortable="custom" prop="createTime" width="140" align="center">
         <template slot-scope="{ row }">
           <span>{{ row.createTime }}</span>
         </template>
@@ -187,10 +198,10 @@
 
 <script>
 import { getArticleList, saveArticle } from '@/api/article'
-import waves from '@/directive/waves' // waves directive
+import waves from '@/directive/waves'
 // eslint-disable-next-line no-unused-vars
 import { parseTime } from '@/utils'
-import Pagination from '@/components/Pagination' // secondary package based on el-pagination
+import Pagination from '@/components/Pagination'
 
 export default {
   name: 'ArticleList',
@@ -254,12 +265,13 @@ export default {
     }
   },
   watch: {
+    // 新建文章跳转到文章列表会刷新，或者在 router 把 noCache false
     '$store.getters.reloadStatus'() {
       this.reload = this.$store.getters.reloadStatus
     },
     reload() {
       if (this.reload) {
-        this.getList()
+        this.handleFilter()
         this.$store.dispatch('constant/updateReload', false)
       }
     }
@@ -268,20 +280,26 @@ export default {
     this.getList()
   },
   methods: {
+    // 获取文章列表
     getList() {
       this.listLoading = true
-      getArticleList(this.listQuery).then(res => {
-        this.list = res.data.list
-        this.total = res.data.total
-        setTimeout(() => {
+      getArticleList(this.listQuery)
+        .then(res => {
+          this.list = res.data.list
+          this.total = res.data.total
+          setTimeout(() => {
+            this.listLoading = false
+          }, 0.8 * 1000)
+        })
+        .catch(() => {
           this.listLoading = false
-        }, 0.8 * 1000)
-      })
+        })
     },
     handleFilter() {
       this.listQuery.current = 1
       this.getList()
     },
+    // 发布文章
     onRelease(id) {
       const _this = this
       this.updateParam.id = id
@@ -291,6 +309,7 @@ export default {
         _this.handleFilter()
       })
     },
+    // 取消发布文章
     onUnRelease(id) {
       const _this = this
       this.updateParam.id = id
