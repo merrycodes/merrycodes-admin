@@ -51,7 +51,7 @@
                       placeholder="请选择"
                       @change="blogForm.tags = articleTag"
                     >
-                      <el-option v-for="item in options" :key="item.value" :value="item.value" />
+                      <el-option v-for="item in tagsList" :key="item" :value="item" />
                     </el-select>
                   </el-form-item>
                 </el-col>
@@ -120,6 +120,7 @@
 
 <script>
 import { saveArticle, getArticle } from '@/api/article'
+import { tagsListByStaus } from '@/api/tags'
 import { mavonEditor } from 'mavon-editor'
 import MDinput from '@/components/MDinput'
 import 'mavon-editor/dist/css/index.css'
@@ -139,6 +140,8 @@ export default {
   },
   data() {
     return {
+      tagsList: null,
+      tagsStaus: false,
       zIndex: false,
       articleTag: [],
       submitting: false,
@@ -203,7 +206,19 @@ export default {
       ]
     }
   },
+  watch: {
+    '$store.getters.tagsStaus'() {
+      this.tagsStaus = this.$store.getters.tagsStaus
+    },
+    tagsStaus() {
+      if (this.tagsStaus) {
+        this.getTagsList()
+        this.$store.dispatch('constant/reloadTags', false)
+      }
+    }
+  },
   created() {
+    this.getTagsList()
     if (this.isEdit) {
       const id = this.$route.params && this.$route.params.id
       this.fetchArticle(id)
@@ -360,6 +375,11 @@ export default {
     setPageTitle() {
       const title = '编辑文章'
       document.title = `${title} - ${this.blogForm.id}`
+    },
+    getTagsList() {
+      tagsListByStaus().then(res => {
+        this.tagsList = res.data
+      })
     }
   }
 }

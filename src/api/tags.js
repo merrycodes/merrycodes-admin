@@ -16,3 +16,17 @@ export function saveTags(data) {
   })
 }
 
+export function tagsList() {
+  return request({
+    url: '/tags/list',
+    method: 'get'
+  })
+}
+
+export function tagsListByStaus() {
+  return request({
+    url: '/tags/stausList',
+    method: 'get'
+  })
+}
+

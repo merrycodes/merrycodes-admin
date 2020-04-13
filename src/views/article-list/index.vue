@@ -9,8 +9,12 @@
         <el-select
           v-model="listQuery.status"
           placeholder="文章状态"
+          default-first-option
+          filterable
           clearable
           class="filter-item"
+          :popper-append-to-body="false"
+          popper-class="z-index-9"
           @change="handleFilter"
         >
           <el-option v-for="item in status" :key="item.key" :label="item.value" :value="item.key" />
@@ -29,9 +33,11 @@
           default-first-option
           clearable
           class="filter-item"
+          :popper-append-to-body="false"
+          popper-class="z-index-9"
           @change="handleFilter"
         >
-          <el-option v-for="item in status" :key="item.key" :label="item.value" :value="item.key" />
+          <el-option v-for="item in tagsList" :key="item" :label="item" :value="item" />
         </el-select>
       </div>
 
@@ -47,6 +53,8 @@
           default-first-option
           clearable
           class="filter-item"
+          :popper-append-to-body="false"
+          popper-class="z-index-9"
           @change="handleFilter"
         >
           <el-option v-for="item in status" :key="item.key" :label="item.value" :value="item.key" />
@@ -198,6 +206,7 @@
 
 <script>
 import { getArticleList, saveArticle } from '@/api/article'
+import { tagsList } from '@/api/tags'
 import waves from '@/directive/waves'
 // eslint-disable-next-line no-unused-vars
 import { parseTime } from '@/utils'
@@ -229,7 +238,9 @@ export default {
     return {
       reload: false,
       list: null,
+      tagsList: null,
       total: 0,
+      tagsStaus: false,
       listLoading: true,
       listQuery: {
         current: 1,
@@ -269,10 +280,19 @@ export default {
     '$store.getters.reloadStatus'() {
       this.reload = this.$store.getters.reloadStatus
     },
+    '$store.getters.tagsStaus'() {
+      this.tagsStaus = this.$store.getters.tagsStaus
+    },
     reload() {
       if (this.reload) {
         this.handleFilter()
         this.$store.dispatch('constant/updateReload', false)
+      }
+    },
+    tagsStaus() {
+      if (this.tagsStaus) {
+        this.handleFilter()
+        this.$store.dispatch('constant/reloadTags', false)
       }
     }
   },
@@ -294,6 +314,9 @@ export default {
         .catch(() => {
           this.listLoading = false
         })
+      tagsList().then(res => {
+        this.tagsList = res.data
+      })
     },
     handleFilter() {
       this.listQuery.current = 1
@@ -352,5 +375,9 @@ export default {
 <style lang="scss" scoped>
 .el-tag + .el-tag {
   margin-left: 10px;
+}
+
+/deep/.z-index-9 {
+  z-index: 8 !important;
 }
 </style>

@@ -10,7 +10,11 @@
           v-model="listQuery.status"
           placeholder="标签状态"
           clearable
+          filterable
+          default-first-option
           class="filtchanger-item"
+          :popper-append-to-body="false"
+          popper-class="z-index-9"
           @change="handleFilter"
         >
           <el-option v-for="item in status" :key="item.key" :label="item.value" :value="item.key" />
@@ -266,7 +270,7 @@ export default {
       this.$prompt('请输入标签名称', '创建文章标签', {
         confirmButtonText: '创建',
         cancelButtonText: '取消',
-        inputPattern: /^[\u4E00-\u9FA5A-Za-z0-9]+$/,
+        inputPattern: /^[\u4E00-\u9FA5\u0020A-Za-z0-9]+$/,
         inputErrorMessage: '请输入中文或英文'
       })
         .then(({ value }) => {
@@ -277,6 +281,7 @@ export default {
           this.submitTags(this.tagsForm, function() {
             _this.$util.notification.success('创建文章标签成功')
             _this.handleFilter()
+            _this.$store.dispatch('constant/reloadTags', true)
           })
         })
         .catch(err => {
@@ -289,7 +294,7 @@ export default {
       this.$prompt('请输入标签名称', '修改文章标签', {
         confirmButtonText: '修改',
         cancelButtonText: '取消',
-        inputPattern: /^[\u4E00-\u9FA5A-Za-z0-9]+$/,
+        inputPattern: /^[\u4E00-\u9FA5\u0020A-Za-z0-9]+$/,
         inputErrorMessage: '请输入中文或英文'
       })
         .then(({ value }) => {
@@ -300,6 +305,7 @@ export default {
           this.submitTags(this.tagsForm, function() {
             _this.$util.notification.success('修改成功文章标签成功')
             _this.getList()
+            _this.$store.dispatch('constant/reloadTags', true)
           })
         })
         .catch(err => {
@@ -316,6 +322,7 @@ export default {
       _this.submitTags(this.tagsForm, function() {
         _this.$util.notification.success('文章标签生效成功')
         _this.getList()
+        _this.$store.dispatch('constant/reloadTags', true)
       })
     },
     // 失效文章标签
@@ -327,6 +334,7 @@ export default {
       _this.submitTags(this.tagsForm, function() {
         _this.$util.notification.success('文章标签失效成功')
         _this.getList()
+        _this.$store.dispatch('constant/reloadTags', true)
       })
     }
   }
@@ -336,5 +344,9 @@ export default {
 <style lang="scss" scoped>
 .text-center {
   text-align: center;
+}
+
+/deep/.z-index-9 {
+  z-index: 8 !important;
 }
 </style>
