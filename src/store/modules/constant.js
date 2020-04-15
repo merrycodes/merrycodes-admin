@@ -1,6 +1,7 @@
 const state = {
   status: false,
-  tagsStaus: false
+  tagsStaus: false,
+  categoryStaus: false
 }
 
 const mutations = {
@@ -9,6 +10,9 @@ const mutations = {
   },
   RELOAD_TAGS: (state, status) => {
     state.tagsStaus = status
+  },
+  RELOAD_CATEGORY: (state, status) => {
+    state.categoryStaus = status
   }
 }
 
@@ -18,6 +22,9 @@ const actions = {
   },
   reloadTags({ commit }, status) {
     commit('RELOAD_TAGS', status)
+  },
+  reloadCategory({ commit }, status) {
+    commit('RELOAD_CATEGORY', status)
   }
 }
 

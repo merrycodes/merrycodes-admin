@@ -111,31 +111,34 @@
       <el-table-column
         label="操作"
         width="210"
+        align="center"
         label-class-name="text-center"
-        class-name="small-padding fixed-width operation"
+        class-name="small-padding fixed-width"
       >
         <template slot-scope="{ row }">
-          <el-button
-            style="margin-left:5px;"
-            size="small"
-            icon="el-icon-edit-outline"
-            type="primary"
-            @click="onSave(row.id)"
-          >编辑</el-button>
-          <el-button
-            v-if="row.status != '1'"
-            size="small"
-            icon="el-icon-s-promotion"
-            type="success"
-            @click="onValid(row.id)"
-          >生效</el-button>
-          <el-button
-            v-if="row.status != '0'"
-            size="small"
-            icon="el-icon-delete"
-            type="danger"
-            @click="onInvalid(row.id)"
-          >失效</el-button>
+          <div class="operation">
+            <el-button
+              style="margin-left:5px;"
+              size="small"
+              icon="el-icon-edit-outline"
+              type="primary"
+              @click="onSave(row.id)"
+            >编辑</el-button>
+            <el-button
+              v-if="row.status != '1'"
+              size="small"
+              icon="el-icon-s-promotion"
+              type="success"
+              @click="onValid(row.id)"
+            >生效</el-button>
+            <el-button
+              v-if="row.status != '0'"
+              size="small"
+              icon="el-icon-delete"
+              type="danger"
+              @click="onInvalid(row.id)"
+            >失效</el-button>
+          </div>
         </template>
       </el-table-column>
     </el-table>
@@ -153,8 +156,6 @@
 <script>
 import { getTagsList, saveTags } from '@/api/tags'
 import waves from '@/directive/waves'
-// eslint-disable-next-line no-unused-vars
-import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination'
 
 export default {
@@ -188,7 +189,7 @@ export default {
         status: undefined,
         name: undefined,
         sort: {
-          name: 'update',
+          name: 'count',
           sort: 'desc'
         }
       },
@@ -348,5 +349,10 @@ export default {
 
 /deep/.z-index-9 {
   z-index: 8 !important;
+}
+
+.operation {
+  display: flex;
+  justify-content: space-around;
 }
 </style>

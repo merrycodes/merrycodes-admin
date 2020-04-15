@@ -57,7 +57,7 @@
           popper-class="z-index-9"
           @change="handleFilter"
         >
-          <el-option v-for="item in status" :key="item.key" :label="item.value" :value="item.key" />
+          <el-option v-for="item in categoryList" :key="item" :label="item" :value="item" />
         </el-select>
       </div>
 
@@ -145,7 +145,7 @@
         </template>
       </el-table-column>
       <!-- 状态 -->
-      <el-table-column label="状态" class-name="status-col" width="90">
+      <el-table-column label="状态" class-name="status-col" width="95">
         <template slot-scope="{ row }">
           <el-tag :type="row.status | statusFilter">{{ row.status | statusNameFilter }}</el-tag>
         </template>
@@ -165,31 +165,34 @@
         label="操作"
         width="195"
         style="text-align:center"
+        align="center"
         class-name="small-padding fixed-width"
       >
         <template slot-scope="{ row }" align="left">
-          <router-link :to="'/edit/'+row.id">
+          <div class="operation">
+            <router-link :to="'/edit/'+row.id">
+              <el-button
+                style="margin-left:5px;"
+                size="small"
+                icon="el-icon-edit-outline"
+                type="primary"
+              >编辑</el-button>
+            </router-link>
             <el-button
-              style="margin-left:5px;"
+              v-if="row.status != '1'"
               size="small"
-              icon="el-icon-edit-outline"
-              type="primary"
-            >编辑</el-button>
-          </router-link>
-          <el-button
-            v-if="row.status != '1'"
-            size="small"
-            icon="el-icon-s-promotion"
-            type="success"
-            @click="onRelease(row.id)"
-          >发布</el-button>
-          <el-button
-            v-if="row.status == '1'"
-            size="small"
-            icon="el-icon-delete"
-            type="danger"
-            @click="onUnRelease(row.id)"
-          >取消发布</el-button>
+              icon="el-icon-s-promotion"
+              type="success"
+              @click="onRelease(row.id)"
+            >发布</el-button>
+            <el-button
+              v-if="row.status == '1'"
+              size="small"
+              icon="el-icon-delete"
+              type="danger"
+              @click="onUnRelease(row.id)"
+            >取消发布</el-button>
+          </div>
         </template>
       </el-table-column>
     </el-table>
@@ -207,9 +210,8 @@
 <script>
 import { getArticleList, saveArticle } from '@/api/article'
 import { tagsList } from '@/api/tags'
+import { categoryList } from '@/api/category'
 import waves from '@/directive/waves'
-// eslint-disable-next-line no-unused-vars
-import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination'
 
 export default {
@@ -239,7 +241,9 @@ export default {
       reload: false,
       list: null,
       tagsList: null,
+      categoryList: null,
       total: 0,
+      categoryStaus: false,
       tagsStaus: false,
       listLoading: true,
       listQuery: {
@@ -283,6 +287,9 @@ export default {
     '$store.getters.tagsStaus'() {
       this.tagsStaus = this.$store.getters.tagsStaus
     },
+    '$store.getters.categoryStaus'() {
+      this.tagsStaus = this.$store.getters.categoryStaus
+    },
     reload() {
       if (this.reload) {
         this.handleFilter()
@@ -294,6 +301,10 @@ export default {
         this.handleFilter()
         this.$store.dispatch('constant/reloadTags', false)
       }
+    },
+    categoryStaus() {
+      this.handleFilter()
+      this.$store.dispatch('constant/reloadCategory', false)
     }
   },
   created() {
@@ -316,6 +327,9 @@ export default {
         })
       tagsList().then(res => {
         this.tagsList = res.data
+      })
+      categoryList().then(res => {
+        this.categoryList = res.data
       })
     },
     handleFilter() {
@@ -379,5 +393,9 @@ export default {
 
 /deep/.z-index-9 {
   z-index: 8 !important;
+}
+.operation {
+  display: flex;
+  justify-content: space-around;
 }
 </style>

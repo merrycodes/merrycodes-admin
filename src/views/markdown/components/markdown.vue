@@ -27,7 +27,7 @@
                       style="width:500px;"
                       placeholder="请选择"
                     >
-                      <el-option v-for="item in options" :key="item.value" :value="item.value" />
+                      <el-option v-for="item in categoryList" :key="item" :value="item" />
                     </el-select>
                   </el-form-item>
                 </el-col>
@@ -110,7 +110,7 @@
               type="file"
               accept=".md"
               @change="importMd($event)"
-            >
+            />
           </template>
         </mavon-editor>
       </el-form-item>
@@ -121,6 +121,7 @@
 <script>
 import { saveArticle, getArticle } from '@/api/article'
 import { tagsListByStaus } from '@/api/tags'
+import { categoryListByStaus } from '@/api/category'
 import { mavonEditor } from 'mavon-editor'
 import MDinput from '@/components/MDinput'
 import 'mavon-editor/dist/css/index.css'
@@ -141,7 +142,9 @@ export default {
   data() {
     return {
       tagsList: null,
+      categoryList: null,
       tagsStaus: false,
+      categoryStaus: false,
       zIndex: false,
       articleTag: [],
       submitting: false,
@@ -210,15 +213,25 @@ export default {
     '$store.getters.tagsStaus'() {
       this.tagsStaus = this.$store.getters.tagsStaus
     },
+    '$store.getters.categoryStaus'() {
+      this.categoryStaus = this.$store.getters.categoryStaus
+    },
     tagsStaus() {
       if (this.tagsStaus) {
         this.getTagsList()
         this.$store.dispatch('constant/reloadTags', false)
       }
+    },
+    categoryStaus() {
+      if (this.categoryStaus) {
+        this.getTagsList()
+        this.$store.dispatch('constant/reloadCategory', false)
+      }
     }
   },
   created() {
     this.getTagsList()
+    this.getcategoryList()
     if (this.isEdit) {
       const id = this.$route.params && this.$route.params.id
       this.fetchArticle(id)
@@ -379,6 +392,11 @@ export default {
     getTagsList() {
       tagsListByStaus().then(res => {
         this.tagsList = res.data
+      })
+    },
+    getcategoryList() {
+      categoryListByStaus().then(res => {
+        this.categoryList = res.data
       })
     }
   }

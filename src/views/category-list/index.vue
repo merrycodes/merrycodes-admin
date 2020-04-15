@@ -2,35 +2,76 @@
   <div class="app-container">
     <div class="filter-container" align="center">
       <!-- 分类状态 -->
-      <div class="el-col el-col-24 el-col-xs-24 el-col-sm-24 el-col-md-12 el-col-lg-3" style="margin-left: 10px;">
-        <el-select v-model="listQuery.importance" placeholder="分类状态" clearable class="filter-item">
-          <el-option v-for="item in importanceOptions" :key="item" :label="item" :value="item" />
+      <div
+        class="el-col el-col-24 el-col-xs-24 el-col-sm-24 el-col-md-12 el-col-lg-3"
+        style="margin-left: 10px;"
+      >
+        <el-select
+          v-model="listQuery.status"
+          placeholder="分类状态"
+          clearable
+          class="filter-item"
+          :popper-append-to-body="false"
+          popper-class="z-index-9"
+          @change="handleFilter"
+        >
+          <el-option v-for="item in status" :key="item.key" :label="item.value" :value="item.key" />
         </el-select>
       </div>
 
       <!-- 分类搜索 -->
-      <div class="el-col el-col-24 el-col-xs-24 el-col-sm-24 el-col-md-12 el-col-lg-6" style="margin-left: 10px;">
-        <el-input v-model="listQuery.title" placeholder="搜索分类" class="filter-item" @keyup.enter.native="handleFilter" />
+      <div
+        class="el-col el-col-24 el-col-xs-24 el-col-sm-24 el-col-md-12 el-col-lg-6"
+        style="margin-left: 10px;"
+      >
+        <el-input
+          v-model="listQuery.name"
+          placeholder="搜索分类"
+          class="filter-item"
+          @keyup.enter.native="handleFilter"
+        />
       </div>
 
       <!-- 搜索按钮 -->
-      <div class="el-col el-col-24 el-col-xs-24 el-col-sm-24 el-col-md-12 el-col-lg-2" style="margin-left: 10px;">
-        <el-button v-waves class="filter-item" type="info" icon="el-icon-search" @click="handleFilter">
-          搜索
-        </el-button>
+      <div
+        class="el-col el-col-24 el-col-xs-24 el-col-sm-24 el-col-md-12 el-col-lg-2"
+        style="margin-left: 10px;"
+      >
+        <el-button
+          v-waves
+          class="filter-item"
+          type="info"
+          icon="el-icon-search"
+          @click="handleFilter"
+        >搜索</el-button>
       </div>
 
-      <div class="el-col el-col-24 el-col-xs-24 el-col-sm-24 el-col-md-12 el-col-lg-2" style="margin-left: 10px;">
-        <el-button class="filter-item" type="success" icon="el-icon-document-add" plain @click="open">
-          新建
-        </el-button>
+      <div
+        class="el-col el-col-24 el-col-xs-24 el-col-sm-24 el-col-md-12 el-col-lg-2"
+        style="margin-left: 10px;"
+      >
+        <el-button
+          class="filter-item"
+          type="success"
+          icon="el-icon-document-add"
+          plain
+          @click="onCreate"
+        >新建</el-button>
       </div>
     </div>
 
     <!-- 表格 -->
-    <el-table :key="tableKey" v-loading="listLoading" :data="list" border fit style="width: 100%;" @sort-change="sortChange">
+    <el-table
+      v-loading="listLoading"
+      :data="list"
+      border
+      fit
+      style="width: 100%;"
+      :default-sort="{prop: 'count', order: 'descending'}"
+      @sort-change="sortChange"
+    >
       <!-- id -->
-      <el-table-column label="ID" prop="id" sortable="custom" align="center" :class-name="getSortClass('id')">
+      <el-table-column label="ID" align="center">
         <template slot-scope="{ row }">
           <span>{{ row.id }}</span>
         </template>
@@ -38,69 +79,81 @@
       <!-- 分类 -->
       <el-table-column label="分类" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.author }}</span>
+          <span>{{ row.name }}</span>
         </template>
       </el-table-column>
       <!-- 状态 -->
       <el-table-column label="状态" class-name="status-col">
         <template slot-scope="{ row }">
-          <el-tag :type="row.status | statusFilter">
-            {{ row.status }}
-          </el-tag>
+          <el-tag :type="row.status | statusFilter">{{ row.status | statusNameFilter }}</el-tag>
         </template>
       </el-table-column>
       <!-- 文章数 -->
-      <el-table-column label="文章数" class-name="status-col">
+      <el-table-column sortable="custom" prop="count" label="文章数" class-name="status-col">
         <template slot-scope="{ row }">
-          <el-tag :type="row.status | statusFilter">
-            {{ row.status }}
-          </el-tag>
+          <span>{{ row.count }}</span>
         </template>
       </el-table-column>
       <!-- 时间 -->
-      <el-table-column label="发布时间" align="center">
+      <el-table-column sortable="custom" prop="createTime" label="发布时间" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.timestamp | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
+          <span>{{ row.createTime }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="修改时间" align="center">
+      <el-table-column sortable="custom" prop="createTime" label="修改时间" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.timestamp | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
+          <span>{{ row.createTime }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="210" label-class-name="text-center" class-name="small-padding fixed-width operation">
+      <el-table-column
+        label="操作"
+        width="210"
+        align="center"
+        label-class-name="text-center"
+        class-name="small-padding fixed-width"
+      >
         <template slot-scope="{ row }">
-          <!-- { row, $index } -->
-          <el-button style="margin-left:5px;" size="small" icon="el-icon-edit-outline" type="primary">
-            编辑
-          </el-button>
-          <el-button v-if="row.status != 'published'" size="small" icon="el-icon-s-promotion" type="success">
-            发布
-          </el-button>
-          <el-button v-if="row.status != 'draft'" size="small" icon="el-icon-delete" type="danger">
-            取消发布
-          </el-button>
+          <div class="operation">
+            <el-button
+              style="margin-left:5px;"
+              size="small"
+              icon="el-icon-edit-outline"
+              type="primary"
+              @click="onSave(row.id)"
+            >编辑</el-button>
+            <el-button
+              v-if="row.status != '1'"
+              size="small"
+              icon="el-icon-s-promotion"
+              type="success"
+              @click="onValid(row.id)"
+            >生效</el-button>
+            <el-button
+              v-if="row.status != '0'"
+              size="small"
+              icon="el-icon-delete"
+              type="danger"
+              @click="onInvalid(row.id)"
+            >失效</el-button>
+          </div>
         </template>
       </el-table-column>
     </el-table>
 
-    <pagination v-show="total > 0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
+    <pagination
+      v-show="total > listQuery.size"
+      :total="total"
+      :page.sync="listQuery.current"
+      :limit.sync="listQuery.size"
+      @pagination="getList"
+    />
   </div>
 </template>
 
 <script>
-import { fetchList } from '@/api/article'
-import waves from '@/directive/waves' // waves directive
-// eslint-disable-next-line no-unused-vars
-import { parseTime } from '@/utils'
-import Pagination from '@/components/Pagination' // secondary package based on el-pagination
-
-const calendarTypeOptions = [
-  { key: 'CN', display_name: 'China' },
-  { key: 'US', display_name: 'USA' },
-  { key: 'JP', display_name: 'Japan' },
-  { key: 'EU', display_name: 'Eurozone' }
-]
+import { getcategoryList, savecategory } from '@/api/category'
+import waves from '@/directive/waves'
+import Pagination from '@/components/Pagination'
 
 export default {
   name: 'CategoryList',
@@ -109,42 +162,48 @@ export default {
   filters: {
     statusFilter(status) {
       const statusMap = {
-        published: 'success',
-        draft: 'info',
-        deleted: 'danger'
+        0: 'info',
+        1: 'success'
+      }
+      return statusMap[status]
+    },
+    statusNameFilter(status) {
+      const statusMap = {
+        0: '失效',
+        1: '生效'
       }
       return statusMap[status]
     }
   },
   data() {
     return {
-      tableKey: 0,
       list: null,
       total: 0,
       listLoading: true,
       listQuery: {
-        page: 1,
-        limit: 20,
-        importance: undefined,
-        title: undefined,
-        type: undefined,
-        sort: undefined
+        current: 1,
+        size: 10,
+        status: undefined,
+        name: undefined,
+        sort: {
+          name: 'count',
+          sort: 'desc'
+        }
       },
-      importanceOptions: [1, 2, 3],
-      calendarTypeOptions,
-      sortOptions: [
-        { label: 'ID Ascending', key: '+id' },
-        { label: 'ID Descending', key: '-id' }
+      status: [
+        {
+          key: 0,
+          value: '失效'
+        },
+        {
+          key: 1,
+          value: '生效'
+        }
       ],
-      statusOptions: ['published', 'draft', 'deleted'],
-      temp: {
+      tagsForm: {
         id: undefined,
-        importance: 1,
-        remark: '',
-        timestamp: new Date(),
-        title: '',
-        type: '',
-        status: 'published'
+        name: undefined,
+        status: undefined
       }
     }
   },
@@ -152,61 +211,127 @@ export default {
     this.getList()
   },
   methods: {
-    open() {
-      this.$prompt('请输入分类名称', '新建分类', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消'
-      })
-        .then(({ value }) => {
-          this.$notify({
-            title: 'success',
-            type: 'success',
-            message: '新建分类为: ' + value,
-            offset: 100
-          })
-        })
-        .catch(() => {
-          this.$notify({
-            title: 'info',
-            type: 'info',
-            message: '取消输入',
-            offset: 100
-          })
-        })
-    },
     getList() {
       this.listLoading = true
-      fetchList(this.listQuery).then(response => {
-        this.list = response.data.items
-        this.total = response.data.total
-
-        // Just to simulate the time of the request
-        setTimeout(() => {
+      getcategoryList(this.listQuery)
+        .then(res => {
+          this.list = res.data.list
+          this.total = res.data.total
+          setTimeout(() => {
+            this.listLoading = false
+          }, 0.8 * 1000)
+        })
+        .catch(() => {
           this.listLoading = false
-        }, 1.5 * 1000)
-      })
+        })
     },
     handleFilter() {
       this.listQuery.page = 1
       this.getList()
     },
-    sortChange(data) {
-      const { prop, order } = data
-      if (prop === 'id') {
-        this.sortByID(order)
-      }
-    },
-    sortByID(order) {
-      if (order === 'ascending') {
-        this.listQuery.sort = '+id'
+    sortChange(column) {
+      if (column.order == null) return
+      if (column.prop === 'updateTime') {
+        this.listQuery.sort = {
+          name: 'update',
+          sort: column.order === 'ascending' ? 'asc' : 'desc'
+        }
+        this.getList()
+      } else if (column.prop === 'createTime') {
+        this.listQuery.sort = {
+          name: 'create',
+          sort: column.order === 'ascending' ? 'asc' : 'desc'
+        }
+        this.getList()
       } else {
-        this.listQuery.sort = '-id'
+        this.listQuery.sort = {
+          name: 'count',
+          sort: column.order === 'ascending' ? 'asc' : 'desc'
+        }
+        this.getList()
       }
-      this.handleFilter()
     },
-    getSortClass: function(key) {
-      const sort = this.listQuery.sort
-      return sort === `+${key}` ? 'ascending' : 'descending'
+    // save / update 共用方法
+    submitTags(data, action) {
+      savecategory(data)
+        .then(res => {
+          action()
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    },
+    // 创建文章标签
+    onCreate() {
+      this.$prompt('请输入分类名称', '创建文章分类', {
+        confirmButtonText: '创建',
+        cancelButtonText: '取消',
+        inputPattern: /^[\u4E00-\u9FA5\u0020A-Za-z0-9]+$/,
+        inputErrorMessage: '请输入中文或英文'
+      })
+        .then(({ value }) => {
+          const _this = this
+          _this.tagsForm.id = undefined
+          _this.tagsForm.name = value
+          _this.tagsForm.status = undefined
+          this.submitTags(this.tagsForm, function() {
+            _this.$util.notification.success('创建文章分类成功')
+            _this.handleFilter()
+            _this.$store.dispatch('constant/reloadCategory', true)
+          })
+        })
+        .catch(err => {
+          console.log(err)
+          this.$util.notification.info('取消创建')
+        })
+    },
+    // 修改文章标签
+    onSave(id) {
+      this.$prompt('请输入分类名称', '修改文章分类', {
+        confirmButtonText: '修改',
+        cancelButtonText: '取消',
+        inputPattern: /^[\u4E00-\u9FA5\u0020A-Za-z0-9]+$/,
+        inputErrorMessage: '请输入中文或英文'
+      })
+        .then(({ value }) => {
+          const _this = this
+          _this.tagsForm.id = id
+          _this.tagsForm.name = value
+          _this.tagsForm.status = undefined
+          this.submitTags(this.tagsForm, function() {
+            _this.$util.notification.success('修改成功文章分类成功')
+            _this.getList()
+            _this.$store.dispatch('constant/reloadCategory', true)
+          })
+        })
+        .catch(err => {
+          console.log(err)
+          this.$util.notification.info('取消修改')
+        })
+    },
+    // 生效文章标签
+    onValid(id) {
+      const _this = this
+      _this.tagsForm.id = id
+      _this.tagsForm.name = undefined
+      _this.tagsForm.status = this.status[1].key
+      _this.submitTags(this.tagsForm, function() {
+        _this.$util.notification.success('文章分类生效成功')
+        _this.getList()
+        _this.$store.dispatch('constant/reloadCategory', true)
+      })
+    },
+    // 失效文章标签
+    onInvalid(id) {
+      const _this = this
+      _this.tagsForm.id = id
+      _this.tagsForm.name = undefined
+      _this.tagsForm.status = this.status[0].key
+      _this.submitTags(this.tagsForm, function() {
+        _this.$util.notification.success('文章分类失效成功')
+        _this.getList()
+        _this.$store.dispatch('constant/reloadCategory', true)
+      })
     }
   }
 }
@@ -215,5 +340,14 @@ export default {
 <style lang="scss" scoped>
 .text-center {
   text-align: center;
+}
+
+/deep/.z-index-9 {
+  z-index: 8 !important;
+}
+
+.operation {
+  display: flex;
+  justify-content: space-around;
 }
 </style>
