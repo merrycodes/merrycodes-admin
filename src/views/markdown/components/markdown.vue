@@ -110,7 +110,7 @@
               type="file"
               accept=".md"
               @change="importMd($event)"
-            />
+            >
           </template>
         </mavon-editor>
       </el-form-item>
