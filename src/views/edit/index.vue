@@ -258,7 +258,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '~@/styles/mixin.scss';
+@import '~@/assets/styles/mixin.scss';
 
 // 解决 md 覆盖 navbar
 .z-index-1 {
