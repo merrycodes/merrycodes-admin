@@ -29,7 +29,10 @@ module.exports = {
   lintOnSave: process.env.NODE_ENV === 'development',
   productionSourceMap: false,
   devServer: {
-    port: 8081
+    port: 8081,
+    // 解决Invalid Host header
+    // https://blog.csdn.net/Cookysurongbin/article/details/86077241
+    disableHostCheck: true
   },
   configureWebpack: {
     // provide the app's title in webpack's name field, so that
