@@ -1,6 +1,13 @@
 <template>
   <div class="app-container">
     <el-form ref="blogForm" :model="blogForm" :rules="rules" label-position="top">
+      <input
+        ref="importMd"
+        style="display : none"
+        type="file"
+        accept=".md"
+        @change="importMd($event)"
+      >
       <el-row :gutter="30">
         <el-col :xs="24" :sm="16" :md="19" :lg="19">
           <el-form-item style="margin-bottom: 40px;" prop="title">
@@ -11,50 +18,21 @@
               id="md"
               v-model="blogForm.mdContent"
               :autofocus="false"
+              :toolbars="toolbars"
               :code-style="'atom-one-dark'"
               :class="[zIndex ? 'full-height' : 'z-index-1']"
               class="mavonEditor"
               @change="onChange"
               @fullScreen="mdScreenChange"
             >
-              <!-- <template slot="left-toolbar-after">
-                <button
-                  type="button"
-                  class="op-icon fa fa-paper-plane"
-                  aria-hidden="true"
-                  :title="`发布文章`"
-                  @click="onRelease"
-                />
-              </template>-->
               <template slot="right-toolbar-before">
                 <button
                   type="button"
-                  class="op-icon fa fa-upload"
-                  aria-hidden="true"
-                  :title="`导入md`"
-                  @click="$refs.importMd.click()"
-                />
-                <button
-                  type="button"
-                  class="op-icon fa fa-download"
-                  aria-hidden="true"
-                  :title="`导出md`"
-                  @click="saveMd"
-                />
-                <button
-                  type="button"
-                  class="op-icon fa fa-file-powerpoint-o"
+                  class="op-icon icon-powerpoint"
                   aria-hidden="true"
                   :title="`添加预览标签`"
                   @click="addSummary"
                 />
-                <input
-                  ref="importMd"
-                  style="display : none"
-                  type="file"
-                  accept=".md"
-                  @change="importMd($event)"
-                >
               </template>
             </mavon-editor>
           </el-form-item>
@@ -95,19 +73,40 @@
               <el-option v-for="item in tagsList" :key="item" :value="item" />
             </el-select>
           </el-form-item>
-          <!-- <el-form-item>
+          <el-form-item align="center">
             <el-switch
+              v-model="blogForm.allowComment"
               active-color="#13ce66"
               active-text="开启评论"
               inactive-text="关闭"
             />
-          </el-form-item>-->
-          <el-form-item>
+          </el-form-item>
+          <el-form-item align="center">
+            <el-row type="flex" justify="space-around">
+              <el-col :span="9">
+                <el-button size="small" @click="$refs.importMd.click()">
+                  <span class="el-icon--left">
+                    <i class="icon-upload" aria-hidden="true" />
+                  </span>
+                  导入md
+                </el-button>
+              </el-col>
+              <el-col :span="9">
+                <el-button size="small" @click="saveMd">
+                  <span class="el-icon--left">
+                    <i class="icon-download" aria-hidden="true" />
+                  </span>
+                  导出md
+                </el-button>
+              </el-col>
+            </el-row>
+          </el-form-item>
+          <el-form-item align="center">
             <el-row type="flex" justify="space-around">
               <el-col :span="9">
                 <el-button type="success" size="small" @click="onSave">
                   <span class="el-icon--left">
-                    <i class="fa fa-paper-plane" aria-hidden="true" />
+                    <i class="icon-plane" aria-hidden="true" />
                   </span>
                   保存
                 </el-button>
@@ -115,7 +114,7 @@
               <el-col :span="9">
                 <el-button type="primary" size="small" @click="onRelease">
                   <span class="el-icon--left">
-                    <i class="fa fa-mavon-floppy-o" aria-hidden="true" />
+                    <i class="icon-floppy" aria-hidden="true" />
                   </span>
                   发布
                 </el-button>
@@ -135,7 +134,6 @@ import { categoryListByStaus } from '@/api/category'
 import { mavonEditor } from 'mavon-editor'
 import MDinput from '@/components/MDinput'
 import 'mavon-editor/dist/css/index.css'
-import 'font-awesome/css/font-awesome.css'
 
 export default {
   name: 'Edit',
@@ -158,8 +156,6 @@ export default {
       zIndex: false,
       articleTag: [],
       submitting: false,
-      // 在没有输入标题情况下导出默认名字为 article
-      outputMdFileName: 'article',
       // 表单数据
       blogForm: {
         id: '',
@@ -167,6 +163,7 @@ export default {
         tags: [],
         status: '',
         category: '',
+        allowComment: '',
         htmlContent: '',
         mdContent: '',
         summaryContent: ''
@@ -194,6 +191,34 @@ export default {
           message: '请输入文章内容',
           trigger: 'blur'
         }
+      },
+      toolbars: {
+        bold: true, // 粗体
+        italic: true, // 斜体
+        header: true, // 标题
+        underline: true, // 下划线
+        strikethrough: true, // 中划线
+        mark: true, // 标记
+        superscript: true, // 上角标
+        subscript: true, // 下角标
+        quote: true, // 引用
+        ol: true, // 有序列表
+        ul: true, // 无序列表
+        link: true, // 链接
+        imagelink: true, // 图片链接
+        code: true, // code
+        table: true, // 表格
+        fullscreen: true, // 全屏编辑
+        readmodel: true, // 沉浸式阅读
+        htmlcode: true, // 展示html源码
+        undo: true, // 上一步
+        redo: true, // 下一步
+        navigation: true, // 导航目录
+        alignleft: true, // 左对齐
+        aligncenter: true, // 居中
+        alignright: true, // 右对齐
+        subfield: true, // 单双栏模式
+        preview: true // 预览
       }
     }
   },
@@ -235,41 +260,13 @@ export default {
   methods: {
     // 导出md
     saveMd() {
-      // 导出的内容
-      const fileData = this.blogForm.mdContent
-      // 默认为文章标题，没有文章标题则使用默认的
-      const fileName = (this.blogForm.title || this.outputMdFileName) + '.md'
-      if (fileData === '') {
-        this.$util.notification.error('内容为空，导出失败')
-        return
-      }
-      var pom = document.createElement('a')
-      pom.setAttribute('href', 'data:text/plain;charset=UTF-8,' + encodeURIComponent(fileData))
-      pom.setAttribute('download', fileName)
-      pom.style.display = 'none'
-      if (document.createEvent) {
-        const event = document.createEvent('MouseEvents')
-        event.initEvent('click', true, true)
-        pom.dispatchEvent(event)
-      } else {
-        pom.click()
-      }
+      const { title, mdContent } = this.blogForm
+      this.$util.saveMd(title, mdContent)
     },
     // 导入md
     importMd(event) {
       const selectedFile = event.target.files[0]
-      const fileName = selectedFile.name
-      // 全段是否为md文件
-      if (fileName.substring(fileName.lastIndexOf('.')) !== '.md') {
-        this.$util.notification.error('请导入md文件')
-        return
-      }
-      const reader = new FileReader()
-      // 文件内容载入完毕之后的回调。
-      reader.onload = e => {
-        this.blogForm.mdContent = e.target.result
-      }
-      reader.readAsText(selectedFile)
+      this.$util.importMd(selectedFile, this)
     },
     // 拖动文件阻止默认事件
     onDrag(e) {
@@ -280,18 +277,8 @@ export default {
       e.stopPropagation()
       e.preventDefault()
       // 拖动md文件导入
-      var dt = e.dataTransfer.files[0]
-      const fileName = dt.name
-      if (fileName.substring(fileName.lastIndexOf('.')) !== '.md') {
-        this.$util.notification.error('请导入md文件')
-        return
-      }
-      const reader = new FileReader()
-      // 文件内容载入完毕之后的回调。
-      reader.onload = e => {
-        this.blogForm.mdContent = e.target.result
-      }
-      reader.readAsText(dt)
+      const selectedFile = e.dataTransfer.files[0]
+      this.$util.importMd(selectedFile, this)
     },
     addSummary() {
       this.blogForm.mdContent += '<!-- read more -->'
@@ -306,7 +293,8 @@ export default {
     // 发布文章
     onRelease() {
       const _this = this
-      this.blogForm.status = this.blogForm.status !== 1 ? 1 : this.blogForm.status
+      const { status } = this.blogForm
+      this.blogForm.status = status !== 1 ? 1 : status
       this.submitArticle('blogForm', function(data) {
         _this.$util.notification.success('文章发布成功！')
         // todo 跳转到列表文章页面
@@ -317,7 +305,7 @@ export default {
     // 保存文章
     onSave() {
       const _this = this
-      const status = this.blogForm.status
+      const { status } = this.blogForm
       this.blogForm.status = typeof status === 'number' ? status : 0
       this.submitArticle('blogForm', function(data) {
         _this.$util.notification.success('保存文章成功！')
@@ -334,10 +322,11 @@ export default {
       }
       this.$refs[formName].validate(valid => {
         if (valid) {
+          const { htmlContent } = this.blogForm
           this.submitting = true
           // 标签转换成字符串
           this.blogForm.tags = this.articleTag.join()
-          this.blogForm.summaryContent = this.$util.getSummary(this.blogForm.htmlContent)
+          this.blogForm.summaryContent = this.$util.getSummary(htmlContent)
           saveArticle(this.blogForm)
             .then(response => {
               action(response.data)
@@ -354,12 +343,10 @@ export default {
     fetchArticle(id) {
       getArticle(id)
         .then(res => {
+          const { tags } = res.data
           this.blogForm = res.data
-          this.articleTag = res.data.tags.split(',')
-          // set tagsview title
+          this.articleTag = tags.split(',')
           this.setTagsViewTitle()
-
-          // set page title
           this.setPageTitle()
         })
         .catch(err => {
@@ -393,6 +380,7 @@ export default {
 
 <style lang="scss" scoped>
 @import '~@/assets/styles/mixin.scss';
+@import '~@/assets/styles/icon.css';
 
 // 解决 md 覆盖 navbar
 .z-index-1 {

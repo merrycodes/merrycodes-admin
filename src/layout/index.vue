@@ -57,6 +57,7 @@ export default {
   position: relative;
   height: 100%;
   width: 100%;
+  user-select: none;
 
   &.mobile.openSidebar {
     position: fixed;

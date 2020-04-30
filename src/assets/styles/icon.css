@@ -1,0 +1,53 @@
+@font-face {
+  font-family: 'merrycodes-front-icon';
+  src: url('../font/merrycodes-admin-font.eot?60929970');
+  src: url('../font/merrycodes-admin-font.eot?60929970#iefix') format('embedded-opentype'), url('../font/merrycodes-admin-font.woff?60929970') format('woff'),
+    url('../font/merrycodes-admin-font.ttf?60929970') format('truetype'), url('../font/merrycodes-admin-font.svg?60929970#merrycodes-admin-font') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+[class^='icon-'],
+[class*=' icon-'] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'merrycodes-front-icon' !important;
+  font-style: normal;
+  font-weight: normal;
+  speak: none;
+
+  display: inline-block;
+  text-decoration: inherit;
+  width: 1em;
+  text-align: center;
+
+  /* For safety - reset parent styles, that can break glyph codes*/
+  font-variant: normal;
+  text-transform: none;
+
+  /* fix buttons height, for twitter bootstrap */
+  line-height: 1em;
+
+  /* Font smoothing. That was taken from TWBS */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-upload:before {
+  content: '\e800';
+}
+
+.icon-download:before {
+  content: '\e801';
+}
+
+.icon-floppy:before {
+  content: '\e802';
+}
+
+.icon-powerpoint:before {
+  content: '\f1c4';
+}
+
+.icon-plane:before {
+  content: '\f1d8';
+}

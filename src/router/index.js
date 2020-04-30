@@ -3,7 +3,6 @@ import Router from 'vue-router'
 
 Vue.use(Router)
 
-/* Layout */
 import Layout from '@/layout'
 
 /**
@@ -71,10 +70,7 @@ export const constantRoutes = [
     redirect: '/aritcle',
     alwaysShow: true,
     name: 'Blog',
-    meta: {
-      title: '博客',
-      icon: 'blog'
-    },
+    meta: { title: '博客', icon: 'blog' },
     children: [
       {
         path: 'aritcle',
@@ -106,6 +102,19 @@ export const constantRoutes = [
         name: 'EditArticle',
         meta: { title: '编辑文章', noCache: true, activeMenu: '/aritcle' },
         hidden: true
+      }
+    ]
+  },
+  {
+    path: '/setting',
+    component: Layout,
+    name: 'Setting',
+    children: [
+      {
+        path: '',
+        component: () => import('@/views/setting/index'),
+        name: 'Setting',
+        meta: { title: '网站设置', icon: 'setting' }
       }
     ]
   }

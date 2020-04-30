@@ -134,7 +134,7 @@
         </template>
       </el-table-column>
       <!-- 标签 -->
-      <el-table-column label="标签" width="160" align="center">
+      <el-table-column label="标签" align="center">
         <template slot-scope="{ row }">
           <el-tag
             v-for="item in row.tags.split(',')"
@@ -316,8 +316,9 @@ export default {
       this.listLoading = true
       getArticleList(this.listQuery)
         .then(res => {
-          this.list = res.data.list
-          this.total = res.data.total
+          const { list, total } = res.data
+          this.list = list
+          this.total = total
           setTimeout(() => {
             this.listLoading = false
           }, 0.8 * 1000)
@@ -367,17 +368,18 @@ export default {
     },
     // 按着 创建时间 / 更新时间 排序
     sortChange(column) {
-      if (column.order == null) return
-      if (column.prop === 'updateTime') {
+      const { order, prop } = column
+      if (order == null) return
+      if (prop === 'updateTime') {
         this.listQuery.sort = {
           name: 'update',
-          sort: column.order === 'ascending' ? 'asc' : 'desc'
+          sort: order === 'ascending' ? 'asc' : 'desc'
         }
         this.getList()
       } else {
         this.listQuery.sort = {
           name: 'create',
-          sort: column.order === 'ascending' ? 'asc' : 'desc'
+          sort: order === 'ascending' ? 'asc' : 'desc'
         }
         this.getList()
       }
@@ -387,15 +389,5 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.el-tag + .el-tag {
-  margin-left: 10px;
-}
-
-/deep/.z-index-9 {
-  z-index: 8 !important;
-}
-.operation {
-  display: flex;
-  justify-content: space-around;
-}
+@import '@/assets/styles/list.scss';
 </style>
