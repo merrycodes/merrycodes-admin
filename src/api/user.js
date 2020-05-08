@@ -1,24 +1,33 @@
 import request from '@/utils/request'
 
+/**
+ * axios transformRequest 全局当次移除
+ * https://segmentfault.com/q/1010000020054684
+ */
 export function login(data) {
   return request({
-    url: '/vue-element-admin/user/login',
+    url: '/auth/login',
     method: 'post',
-    data
+    data: data,
+    transformRequest: data => {
+      return JSON.stringify(data)
+    },
+    headers: {
+      'Content-Type': 'application/json;charset=UTF-8'
+    }
   })
 }
 
-export function getInfo(token) {
+export function getInfo() {
   return request({
-    url: '/vue-element-admin/user/info',
-    method: 'get',
-    params: { token }
+    url: '/user/role',
+    method: 'get'
   })
 }
 
 export function logout() {
   return request({
-    url: '/vue-element-admin/user/logout',
+    url: '/auth/logout',
     method: 'post'
   })
 }
