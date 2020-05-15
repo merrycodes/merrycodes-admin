@@ -227,7 +227,7 @@ export default {
         })
     },
     handleFilter() {
-      this.listQuery.page = 1
+      this.listQuery.current = 1
       this.getList()
     },
     sortChange(column) {

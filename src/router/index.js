@@ -108,7 +108,6 @@ export const constantRoutes = [
   {
     path: '/setting',
     component: Layout,
-    name: 'Setting',
     children: [
       {
         path: '',

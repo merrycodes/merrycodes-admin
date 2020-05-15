@@ -18,6 +18,13 @@ export function login(data) {
   })
 }
 
+export function logout() {
+  return request({
+    url: '/auth/logout',
+    method: 'post'
+  })
+}
+
 export function getInfo() {
   return request({
     url: '/user/role',
@@ -25,9 +32,10 @@ export function getInfo() {
   })
 }
 
-export function logout() {
+export function changePassword(data) {
   return request({
-    url: '/auth/logout',
-    method: 'post'
+    url: '/user/change-pwd',
+    method: 'post',
+    data: data
   })
 }

@@ -103,7 +103,7 @@
               placeholder="请输入新密码"
             />
           </el-form-item>
-          <el-form-item label="确认新密码:" prop="repeatPassword" required>
+          <el-form-item label="确认新密码:" prop="repeatPassword">
             <el-input
               v-model="passwordForm.repeatPassword"
               type="password"
@@ -113,7 +113,7 @@
             />
           </el-form-item>
           <el-form-item>
-            <!-- <el-button type="primary" size="small" @click="submitAfterValidate('passwordForm')">保存修改</el-button> -->
+            <el-button type="primary" size="small" @click="submitAfterValidate('passwordForm')">保存修改</el-button>
           </el-form-item>
         </el-form>
       </el-tab-pane>
@@ -123,6 +123,7 @@
 
 <script>
 import { saveSetting, getSetting } from '@/api/setting'
+import { changePassword } from '@/api/user'
 
 export default {
   name: 'Setting',
@@ -159,7 +160,10 @@ export default {
       passwordRules: {
         oldPassword: [{ required: true, message: '请输入原密码', trigger: 'blur' }],
         newPassword: [{ required: true, message: '请输入新密码', trigger: 'blur' }],
-        repeatPassword: [{ validator: repeatPasswordValidate, trigger: 'blur' }]
+        repeatPassword: [
+          { required: true, message: '请再次输入新密码', trigger: 'blur' },
+          { validator: repeatPasswordValidate, trigger: 'blur' }
+        ]
       }
     }
   },
@@ -167,6 +171,10 @@ export default {
     this.getSetting()
   },
   methods: {
+    async logout() {
+      await this.$store.dispatch('user/logout')
+      this.$router.push(`/login?redirect=${this.$route.fullPath}`)
+    },
     getSetting() {
       getSetting().then(res => {
         const setting = res.data
@@ -175,17 +183,14 @@ export default {
         }
       })
     },
-    // submitPassword() {
-    //   this.$api.auth.resetPassword(this.passwordForm.oldPassword, this.passwordForm.newPassword).then(data => {
-    //     if (data.data === true) {
-    //       this.$util.message.success('更新设置成功!')
-    //     } else {
-    //       const message = data.msg || '保存失败,未更新数据库'
-    //       this.$util.message.error(message)
-    //     }
-    //     this.$router.push('/admin/login')
-    //   })
-    // },
+    submitPassword() {
+      // eslint-disable-next-line no-unused-vars
+      const { repeatPassword, ...data } = this.passwordForm
+      changePassword(data).then(res => {
+        this.$util.notification.success('更新设置成功!')
+        this.logout()
+      })
+    },
     submitSetting() {
       saveSetting(this.setting).then(() => {
         this.$util.notification.success('更新设置成功！')
