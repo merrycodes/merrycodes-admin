@@ -104,7 +104,12 @@
           <el-form-item align="center">
             <el-row type="flex" justify="space-around">
               <el-col :span="9">
-                <el-button type="success" size="small" @click="onSave">
+                <el-button
+                  v-if="checkPermission(['ADMIN'])"
+                  type="success"
+                  size="small"
+                  @click="onSave"
+                >
                   <span class="el-icon--left">
                     <i class="icon-plane" aria-hidden="true" />
                   </span>
@@ -112,7 +117,12 @@
                 </el-button>
               </el-col>
               <el-col :span="9">
-                <el-button type="primary" size="small" @click="onRelease">
+                <el-button
+                  v-if="checkPermission(['ADMIN'])"
+                  type="primary"
+                  size="small"
+                  @click="onRelease"
+                >
                   <span class="el-icon--left">
                     <i class="icon-floppy" aria-hidden="true" />
                   </span>
@@ -128,6 +138,7 @@
 </template>
 
 <script>
+import checkPermission from '@/utils/permission'
 import { saveArticle, getArticle } from '@/api/article'
 import { tagsListByStaus } from '@/api/tags'
 import { categoryListByStaus } from '@/api/category'
@@ -151,8 +162,6 @@ export default {
     return {
       tagsList: null,
       categoryList: null,
-      tagsStaus: false,
-      categoryStaus: false,
       zIndex: false,
       articleTag: [],
       submitting: false,
@@ -222,25 +231,9 @@ export default {
       }
     }
   },
-  watch: {
-    '$store.getters.tagsStaus'() {
-      this.tagsStaus = this.$store.getters.tagsStaus
-    },
-    '$store.getters.categoryStaus'() {
-      this.categoryStaus = this.$store.getters.categoryStaus
-    },
-    tagsStaus() {
-      if (this.tagsStaus) {
-        this.getTagsList()
-        this.$store.dispatch('constant/reloadTags', false)
-      }
-    },
-    categoryStaus() {
-      if (this.categoryStaus) {
-        this.getTagsList()
-        this.$store.dispatch('constant/reloadCategory', false)
-      }
-    }
+  activated() {
+    this.getTagsList()
+    this.getcategoryList()
   },
   created() {
     this.getTagsList()
@@ -258,6 +251,7 @@ export default {
     md.addEventListener('drop', this.onDrop, false)
   },
   methods: {
+    checkPermission,
     // 导出md
     saveMd() {
       const { title, mdContent } = this.blogForm
@@ -292,26 +286,20 @@ export default {
     },
     // 发布文章
     onRelease() {
-      const _this = this
       const { status } = this.blogForm
       this.blogForm.status = status !== 1 ? 1 : status
-      this.submitArticle('blogForm', function(data) {
-        _this.$util.notification.success('文章发布成功！')
-        // todo 跳转到列表文章页面
-        _this.$router.push({ path: '/aritcle' })
-        _this.$store.dispatch('constant/updateReload', true)
+      this.submitArticle('blogForm', () => {
+        this.$util.notification.success('文章发布成功！')
+        this.$router.push({ path: '/aritcle' })
       })
     },
     // 保存文章
     onSave() {
-      const _this = this
       const { status } = this.blogForm
       this.blogForm.status = typeof status === 'number' ? status : 0
-      this.submitArticle('blogForm', function(data) {
-        _this.$util.notification.success('保存文章成功！')
-        // todo 跳转到列表文章页面
-        _this.$router.push({ path: '/aritcle' })
-        _this.$store.dispatch('constant/updateReload', true)
+      this.submitArticle('blogForm', () => {
+        this.$util.notification.success('保存文章成功！')
+        this.$router.push({ path: '/aritcle' })
       })
     },
     // 提交
@@ -320,38 +308,33 @@ export default {
         this.$util.notification.error('请不要提交过快!')
         return
       }
-      this.$refs[formName].validate(valid => {
+      this.$refs[formName].validate(async valid => {
         if (valid) {
           const { htmlContent } = this.blogForm
           this.submitting = true
           // 标签转换成字符串
-          this.blogForm.tags = this.articleTag.join()
-          this.blogForm.summaryContent = this.$util.getSummary(htmlContent)
-          saveArticle(this.blogForm)
-            .then(response => {
-              action(response.data)
-              this.submitting = false
-            })
-            .catch(err => {
-              console.log(err)
-              this.submitting = false
-            })
+          this.blogForm = { tags: this.articleTag.join(), summaryContent: this.$util.getSummary(htmlContent), ...this.blogForm }
+          try {
+            await saveArticle(this.blogForm)
+            action()
+            this.submitting = false
+          } catch (e) {
+            this.submitting = false
+          }
         }
       })
     },
     // 获取文章详情
-    fetchArticle(id) {
-      getArticle(id)
-        .then(res => {
-          const { tags } = res.data
-          this.blogForm = res.data
-          this.articleTag = tags.split(',')
-          this.setTagsViewTitle()
-          this.setPageTitle()
-        })
-        .catch(err => {
-          console.log(err)
-        })
+    async fetchArticle(id) {
+      try {
+        const { data } = await getArticle(id)
+        this.blogForm = data
+        this.articleTag = data.tags.split(',')
+        this.setTagsViewTitle()
+        this.setPageTitle()
+      } catch (e) {
+        this.$router.back(-1)
+      }
     },
     setTagsViewTitle() {
       const title = '编辑文章'
@@ -364,15 +347,11 @@ export default {
       const title = '编辑文章'
       document.title = `${title} - ${this.blogForm.id}`
     },
-    getTagsList() {
-      tagsListByStaus().then(res => {
-        this.tagsList = res.data
-      })
+    async getTagsList() {
+      this.tagsList = (await tagsListByStaus()).data
     },
-    getcategoryList() {
-      categoryListByStaus().then(res => {
-        this.categoryList = res.data
-      })
+    async getcategoryList() {
+      this.categoryList = (await categoryListByStaus()).data
     }
   }
 }

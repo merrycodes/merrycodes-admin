@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function saveArticle(data) {
   return request({
-    url: '/article/save',
+    url: '/article',
     method: 'post',
     data: data
   })

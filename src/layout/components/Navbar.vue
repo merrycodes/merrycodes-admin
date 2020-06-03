@@ -22,12 +22,12 @@
 
       <el-dropdown class="avatar-container right-menu-item hover-effect" trigger="click">
         <div class="avatar-wrapper">
-          <img :src=" '?imageView2/1/w/80/h/80'" class="user-avatar">
+          <img src="../../../public/logo.png" class="user-avatar">
           <i class="el-icon-caret-bottom" />
         </div>
         <el-dropdown-menu slot="dropdown">
           <router-link to="/">
-            <el-dropdown-item>主页</el-dropdown-item>
+            <el-dropdown-item>首页</el-dropdown-item>
           </router-link>
           <a target="_blank" href="https://github.com/merrycodes/merrycodes-admin">
             <el-dropdown-item>Github</el-dropdown-item>
@@ -58,7 +58,6 @@ export default {
     SizeSelect
   },
   computed: {
-    // ...mapGetters(['sidebar', 'avatar', 'device'])
     ...mapGetters(['sidebar', 'device'])
   },
   methods: {

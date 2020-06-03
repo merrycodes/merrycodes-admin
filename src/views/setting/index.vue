@@ -25,7 +25,12 @@
             />
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" size="small" @click="submitAfterValidate('websiteForm')">保存修改</el-button>
+            <el-button
+              v-if="checkPermission(['ADMIN'])"
+              type="primary"
+              size="small"
+              @click="submitForm('websiteForm')"
+            >保存修改</el-button>
           </el-form-item>
         </el-form>
       </el-tab-pane>
@@ -78,7 +83,12 @@
           </el-form-item>
 
           <el-form-item>
-            <el-button type="primary" size="small" @click="submitSetting">保存修改</el-button>
+            <el-button
+              v-if="checkPermission(['ADMIN'])"
+              type="primary"
+              size="small"
+              @click="submitSetting"
+            >保存修改</el-button>
           </el-form-item>
         </el-form>
       </el-tab-pane>
@@ -103,9 +113,9 @@
               placeholder="请输入新密码"
             />
           </el-form-item>
-          <el-form-item label="确认新密码:" prop="repeatPassword">
+          <el-form-item label="确认新密码:" prop="rePassword">
             <el-input
-              v-model="passwordForm.repeatPassword"
+              v-model="passwordForm.rePassword"
               type="password"
               spellcheck="false"
               clear
@@ -113,7 +123,12 @@
             />
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" size="small" @click="submitAfterValidate('passwordForm')">保存修改</el-button>
+            <el-button
+              v-if="checkPermission(['ADMIN'])"
+              type="primary"
+              size="small"
+              @click="submitForm('passwordForm')"
+            >保存修改</el-button>
           </el-form-item>
         </el-form>
       </el-tab-pane>
@@ -122,16 +137,22 @@
 </template>
 
 <script>
+import checkPermission from '@/utils/permission'
 import { saveSetting, getSetting } from '@/api/setting'
 import { changePassword } from '@/api/user'
 
 export default {
   name: 'Setting',
   data() {
-    const repeatPasswordValidate = (rule, value, callback) => {
-      if (value === '') {
-        callback(new Error('请再次输入确认密码'))
-      } else if (value !== this.passwordForm.newPassword) {
+    const passwordValidate = (rule, value, callback) => {
+      if (value !== this.passwordForm.rePassword) {
+        this.$refs.passwordForm.validateField('rePassword')
+      } else {
+        callback()
+      }
+    }
+    const rePasswordValidate = (rule, value, callback) => {
+      if (value !== this.passwordForm.newPassword) {
         callback(new Error('两次输入的密码不一样'))
       } else {
         callback()
@@ -141,7 +162,7 @@ export default {
       passwordForm: {
         oldPassword: '',
         newPassword: '',
-        repeatPassword: ''
+        rePassword: ''
       },
       setting: {
         blog_name: '',
@@ -155,15 +176,15 @@ export default {
         google_analytics: ''
       },
       websiteRules: {
-        blog_website: [{ type: 'url', message: '请输入正确格式的网址', trigger: 'blur' }]
+        blog_website: [{ type: 'url', message: '请输入正确格式的网址', trigger: ['blur', 'change'] }]
       },
       passwordRules: {
-        oldPassword: [{ required: true, message: '请输入原密码', trigger: 'blur' }],
-        newPassword: [{ required: true, message: '请输入新密码', trigger: 'blur' }],
-        repeatPassword: [
-          { required: true, message: '请再次输入新密码', trigger: 'blur' },
-          { validator: repeatPasswordValidate, trigger: 'blur' }
-        ]
+        oldPassword: [{ required: true, message: '请输入原密码', trigger: ['blur', 'change'] }],
+        newPassword: [
+          { required: true, message: '请输入新密码', trigger: ['blur', 'change'] },
+          { validator: passwordValidate, trigger: ['blur'] }
+        ],
+        rePassword: [{ validator: rePasswordValidate, trigger: ['blur', 'change'] }]
       }
     }
   },
@@ -171,41 +192,38 @@ export default {
     this.getSetting()
   },
   methods: {
+    checkPermission,
     async logout() {
       await this.$store.dispatch('user/logout')
       this.$router.push(`/login?redirect=${this.$route.fullPath}`)
     },
-    getSetting() {
-      getSetting().then(res => {
-        const setting = res.data
-        for (const key in setting) {
-          this.setting[key] = setting[key]
-        }
-      })
+    async getSetting() {
+      const setting = (await getSetting()).data
+      for (const key in setting) {
+        this.setting[key] = setting[key]
+      }
     },
-    submitPassword() {
+    async submitPassword() {
       // eslint-disable-next-line no-unused-vars
-      const { repeatPassword, ...data } = this.passwordForm
-      changePassword(data).then(res => {
-        this.$util.notification.success('更新设置成功!')
-        this.logout()
-      })
+      const { rePassword, ...data } = this.passwordForm
+      await changePassword(data)
+      this.$util.notification.success('更新设置成功!')
+      this.logout()
     },
-    submitSetting() {
-      saveSetting(this.setting).then(() => {
-        this.$util.notification.success('更新设置成功！')
-      })
+    async submitSetting() {
+      await saveSetting(this.setting)
+      this.$util.notification.success('更新设置成功！')
     },
-    submitAfterValidate(formName) {
-      let fuc
+    submitForm(formName) {
+      let action
       if (formName === 'passwordForm') {
-        fuc = this.submitPassword
+        action = this.submitPassword
       } else {
-        fuc = this.submitSetting
+        action = this.submitSetting
       }
       this.$refs[formName].validate(valid => {
         if (valid) {
-          fuc()
+          action()
         }
       })
     }

@@ -15,7 +15,8 @@ const FUNCTIONS = {
         title: 'success',
         message: message || '成功',
         type: 'success',
-        offset: 100
+        offset: 100,
+        duration: 3000
       })
     },
     warning: function(message) {
@@ -23,7 +24,8 @@ const FUNCTIONS = {
         title: 'warning',
         message: message || '警告',
         type: 'warning',
-        offset: 100
+        offset: 100,
+        duration: 3000
       })
     },
     info: function(message) {
@@ -31,7 +33,8 @@ const FUNCTIONS = {
         title: 'info',
         message: message || '提示',
         type: 'info',
-        offset: 100
+        offset: 100,
+        duration: 3000
       })
     },
     error: function(message) {
@@ -39,7 +42,8 @@ const FUNCTIONS = {
         title: 'error',
         message: message || '异常',
         type: 'error',
-        offset: 100
+        offset: 100,
+        duration: 3000
       })
     }
   },
@@ -56,13 +60,13 @@ const FUNCTIONS = {
    * @param title 文章标题
    * @param content 文章内容
    */
-  saveMd: (title, content) => {
-    // 默认为文章标题，没有文章标题则使用默认的
-    const fileName = (title || 'article') + '.md'
+  saveMd(title, content) {
     if (content === '') {
       this.notification.error('内容为空，导出失败')
       return
     }
+    // 默认为文章标题，没有文章标题则使用默认的
+    const fileName = (title || 'article') + '.md'
     var pom = document.createElement('a')
     pom.setAttribute('href', 'data:text/plain;charset=UTF-8,' + encodeURIComponent(content))
     pom.setAttribute('download', fileName)
@@ -77,7 +81,7 @@ const FUNCTIONS = {
   },
 
   /**
-   * 导出md文章
+   * 导入md文章
    * @param selectedFile
    * @param _this
    */

@@ -10,7 +10,7 @@ export function getcategoryList(data) {
 
 export function savecategory(data) {
   return request({
-    url: '/category/save',
+    url: '/category',
     method: 'post',
     data: data
   })
@@ -29,4 +29,3 @@ export function categoryListByStaus() {
     method: 'get'
   })
 }
-

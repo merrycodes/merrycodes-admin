@@ -62,20 +62,18 @@
 </template>
 
 <script>
-import { validUsername } from '@/utils/validate'
-
 export default {
   name: 'Login',
   data() {
     const validateUsername = (rule, value, callback) => {
-      if (!validUsername(value)) {
+      if (value.trim() === null || value.trim() === undefined) {
         callback(new Error('请输入用户名'))
       } else {
         callback()
       }
     }
     const validatePassword = (rule, value, callback) => {
-      if (value.length < 0) {
+      if (value.length < 3) {
         callback(new Error('请输入密码'))
       } else {
         callback()
@@ -83,12 +81,12 @@ export default {
     }
     return {
       loginForm: {
-        username: '123',
-        password: '123'
+        username: '',
+        password: ''
       },
       loginRules: {
-        username: [{ required: true, trigger: 'blur', validator: validateUsername }],
-        password: [{ required: true, trigger: 'blur', validator: validatePassword }]
+        username: [{ required: true, trigger: ['blur', 'change'], validator: validateUsername }],
+        password: [{ required: true, trigger: ['blur', 'change'], validator: validatePassword }]
       },
       passwordType: 'password',
       capsTooltip: false,
@@ -145,7 +143,7 @@ export default {
               this.loading = false
             })
         } else {
-          console.log('error submit!!')
+          console.log('错误提交!!')
           return false
         }
       })

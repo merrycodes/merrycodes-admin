@@ -10,7 +10,7 @@ export function getTagsList(data) {
 
 export function saveTags(data) {
   return request({
-    url: '/tags/save',
+    url: '/tags',
     method: 'post',
     data: data
   })
@@ -29,4 +29,3 @@ export function tagsListByStaus() {
     method: 'get'
   })
 }
-

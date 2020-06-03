@@ -35,7 +35,46 @@ export function getInfo() {
 export function changePassword(data) {
   return request({
     url: '/user/change-pwd',
+    method: 'put',
+    data: data
+  })
+}
+
+export function getUserList(data) {
+  return request({
+    url: '/user',
+    method: 'get',
+    params: data
+  })
+}
+
+export function saveUser(data) {
+  return request({
+    url: '/user',
     method: 'post',
+    data: data
+  })
+}
+
+export function removeUser(data) {
+  return request({
+    url: '/user/' + data,
+    method: 'delete'
+  })
+}
+
+export function updateEnableUser(data) {
+  return request({
+    url: '/user/enable',
+    method: 'put',
+    data: data
+  })
+}
+
+export function updateUserRole(data) {
+  return request({
+    url: '/user/role',
+    method: 'put',
     data: data
   })
 }

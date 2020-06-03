@@ -13,12 +13,26 @@ const request = axios.create({
   timeout: 5000, // request timeout
   transformRequest: [
     data => {
+      if (data !== null && data !== undefined) {
+        Object.keys(data).forEach(key => {
+          if (data[key] === null || data[key] === undefined) {
+            delete data[key]
+          }
+        })
+      }
       // 序列化参数数组时不设置索引，否则tomcat8.5以上无法接收特殊字符
       return qs.stringify(data, { indices: false })
     }
   ],
   // 序列化params参数
   paramsSerializer: params => {
+    if (params !== null && params !== undefined) {
+      Object.keys(params).forEach(key => {
+        if (params[key] === null || params[key] === undefined) {
+          delete params[key]
+        }
+      })
+    }
     // 序列化参数数组时不设置索引，否则tomcat8.5以上无法接收特殊字符
     return qs.stringify(params, { indices: false })
   }

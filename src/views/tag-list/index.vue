@@ -62,94 +62,95 @@
         >新建</el-button>
       </div>
     </div>
-
-    <!-- 表格 -->
-    <el-table
-      v-loading="listLoading"
-      :data="list"
-      border
-      fit
-      style="width: 100%;"
-      :default-sort="{prop: 'count', order: 'descending'}"
-      @sort-change="sortChange"
-    >
-      <!-- id -->
-      <el-table-column label="ID" align="center">
-        <template slot-scope="{ row }">
-          <span>{{ row.id }}</span>
-        </template>
-      </el-table-column>
-      <!-- 标签 -->
-      <el-table-column label="标签" align="center">
-        <template slot-scope="{ row }">
-          <span>{{ row.name }}</span>
-        </template>
-      </el-table-column>
-      <!-- 状态 -->
-      <el-table-column label="状态" class-name="status-col">
-        <template slot-scope="{ row }">
-          <el-tag :type="row.status | statusFilter">{{ row.status | statusNameFilter }}</el-tag>
-        </template>
-      </el-table-column>
-      <!-- 文章数 -->
-      <el-table-column sortable="custom" prop="count" label="文章数" class-name="status-col">
-        <template slot-scope="{ row }">
-          <span>{{ row.count }}</span>
-        </template>
-      </el-table-column>
-      <!-- 时间 -->
-      <el-table-column sortable="custom" prop="createTime" label="发布时间" align="center">
-        <template slot-scope="{ row }">
-          <span>{{ row.createTime }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column sortable="custom" prop="updateTime" label="修改时间" align="center">
-        <template slot-scope="{ row }">
-          <span>{{ row.updateTime }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        label="操作"
-        width="210"
-        align="center"
-        label-class-name="text-center"
-        class-name="small-padding fixed-width"
+    <div class="filter-container">
+      <!-- 表格 -->
+      <el-table
+        v-loading="listLoading"
+        :data="list"
+        border
+        fit
+        style="width: 100%;"
+        :default-sort="{prop: 'count', order: 'descending'}"
+        @sort-change="sortChange"
       >
-        <template slot-scope="{ row }">
-          <div class="operation">
-            <el-button
-              style="margin-left:5px;"
-              size="small"
-              icon="el-icon-edit-outline"
-              type="primary"
-              @click="onSave(row.id)"
-            >编辑</el-button>
-            <el-button
-              v-if="row.status != '1'"
-              size="small"
-              icon="el-icon-s-promotion"
-              type="success"
-              @click="onValid(row.id)"
-            >生效</el-button>
-            <el-button
-              v-if="row.status != '0'"
-              size="small"
-              icon="el-icon-delete"
-              type="danger"
-              @click="onInvalid(row.id)"
-            >失效</el-button>
-          </div>
-        </template>
-      </el-table-column>
-    </el-table>
+        <!-- id -->
+        <el-table-column label="ID" align="center">
+          <template slot-scope="{ row }">
+            <span>{{ row.id }}</span>
+          </template>
+        </el-table-column>
+        <!-- 标签 -->
+        <el-table-column label="标签" align="center">
+          <template slot-scope="{ row }">
+            <span>{{ row.name }}</span>
+          </template>
+        </el-table-column>
+        <!-- 状态 -->
+        <el-table-column label="状态" class-name="status-col">
+          <template slot-scope="{ row }">
+            <el-tag :type="row.status | statusFilter">{{ row.status | statusNameFilter }}</el-tag>
+          </template>
+        </el-table-column>
+        <!-- 文章数 -->
+        <el-table-column sortable="custom" prop="count" label="文章数" class-name="status-col">
+          <template slot-scope="{ row }">
+            <span>{{ row.count }}</span>
+          </template>
+        </el-table-column>
+        <!-- 时间 -->
+        <el-table-column sortable="custom" prop="createTime" label="发布时间" align="center">
+          <template slot-scope="{ row }">
+            <span>{{ row.createTime }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column sortable="custom" prop="updateTime" label="修改时间" align="center">
+          <template slot-scope="{ row }">
+            <span>{{ row.updateTime }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column
+          label="操作"
+          width="210"
+          align="center"
+          label-class-name="text-center"
+          class-name="small-padding fixed-width"
+        >
+          <template slot-scope="{ row }">
+            <div class="operation">
+              <el-button
+                style="margin-left:5px;"
+                size="small"
+                icon="el-icon-edit-outline"
+                type="primary"
+                @click="onSave(row.id)"
+              >编辑</el-button>
+              <el-button
+                v-if="row.status != '1'"
+                size="small"
+                icon="el-icon-s-promotion"
+                type="success"
+                @click="onValid(row.id)"
+              >生效</el-button>
+              <el-button
+                v-if="row.status != '0'"
+                size="small"
+                icon="el-icon-delete"
+                type="danger"
+                @click="onInvalid(row.id)"
+              >失效</el-button>
+            </div>
+          </template>
+        </el-table-column>
+      </el-table>
 
-    <pagination
-      v-show="total > listQuery.size"
-      :total="total"
-      :page.sync="listQuery.current"
-      :limit.sync="listQuery.size"
-      @pagination="getList"
-    />
+      <pagination
+        v-show="total > listQuery.size"
+        :total="total"
+        :page.sync="listQuery.current"
+        :limit.sync="listQuery.size"
+        @pagination="getList"
+      />
+    </div>
   </div>
 </template>
 
@@ -180,7 +181,7 @@ export default {
   },
   data() {
     return {
-      list: null,
+      list: [],
       total: 0,
       listLoading: true,
       listQuery: {
@@ -214,21 +215,30 @@ export default {
     this.getList()
   },
   methods: {
+    makeConfirm(title, action) {
+      this.$confirm(title, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
+          action()
+        })
+        .catch(() => {})
+    },
     // 获取文章标签列表
-    getList() {
+    async getList() {
       this.listLoading = true
-      getTagsList(this.listQuery)
-        .then(res => {
-          const { list, total } = res.data
-          this.list = list
-          this.total = total
-          setTimeout(() => {
-            this.listLoading = false
-          }, 0.8 * 1000)
-        })
-        .catch(() => {
+      try {
+        const { list, total } = (await getTagsList(this.listQuery)).data
+        this.list = list
+        this.total = total
+        setTimeout(() => {
           this.listLoading = false
-        })
+        }, 0.8 * 1000)
+      } catch (e) {
+        this.listLoading = false
+      }
     },
     handleFilter() {
       this.listQuery.current = 1
@@ -259,14 +269,11 @@ export default {
       }
     },
     // save / update 共用方法
-    submitTags(data, action) {
-      saveTags(data)
-        .then(res => {
-          action()
-        })
-        .catch(err => {
-          console.log(err)
-        })
+    submitTags(data, action, title) {
+      this.makeConfirm(title, async() => {
+        await saveTags(data)
+        action()
+      })
     },
     // 创建文章标签
     onCreate() {
@@ -277,19 +284,18 @@ export default {
         inputErrorMessage: '请输入中文或英文'
       })
         .then(({ value }) => {
-          const _this = this
-          _this.tagsForm.id = undefined
-          _this.tagsForm.name = value
-          _this.tagsForm.status = undefined
-          this.submitTags(this.tagsForm, function() {
-            _this.$util.notification.success('创建文章标签成功')
-            _this.handleFilter()
-            _this.$store.dispatch('constant/reloadTags', true)
-          })
+          this.tagsForm = { id: undefined, name: value, status: undefined }
+          this.submitTags(
+            this.tagsForm,
+            () => {
+              this.$util.notification.success('创建文章标签成功')
+              this.handleFilter()
+            },
+            '确认要创建文章标签吗？'
+          )
         })
         .catch(err => {
           console.log(err)
-          this.$util.notification.info('取消创建')
         })
     },
     // 修改文章标签
@@ -301,44 +307,43 @@ export default {
         inputErrorMessage: '请输入中文或英文'
       })
         .then(({ value }) => {
-          const _this = this
-          _this.tagsForm.id = id
-          _this.tagsForm.name = value
-          _this.tagsForm.status = undefined
-          this.submitTags(this.tagsForm, function() {
-            _this.$util.notification.success('修改成功文章标签成功')
-            _this.getList()
-            _this.$store.dispatch('constant/reloadTags', true)
-          })
+          this.tagsForm = { id, name: value, status: undefined }
+          this.submitTags(
+            this.tagsForm,
+            () => {
+              this.$util.notification.success('修改成功文章标签成功')
+              this.getList()
+            },
+            '确认要修改此文章标签吗？'
+          )
         })
         .catch(err => {
           console.log(err)
-          this.$util.notification.info('取消修改')
         })
     },
     // 生效文章标签
     onValid(id) {
-      const _this = this
-      _this.tagsForm.id = id
-      _this.tagsForm.name = undefined
-      _this.tagsForm.status = this.status[1].key
-      _this.submitTags(this.tagsForm, function() {
-        _this.$util.notification.success('文章标签生效成功')
-        _this.getList()
-        _this.$store.dispatch('constant/reloadTags', true)
-      })
+      this.tagsForm = { id, name: undefined, status: this.status[1].key }
+      this.submitTags(
+        this.tagsForm,
+        () => {
+          this.$util.notification.success('文章标签生效成功')
+          this.getList()
+        },
+        '确认要生效此文章标签吗？'
+      )
     },
     // 失效文章标签
     onInvalid(id) {
-      const _this = this
-      _this.tagsForm.id = id
-      _this.tagsForm.name = undefined
-      _this.tagsForm.status = this.status[0].key
-      _this.submitTags(this.tagsForm, function() {
-        _this.$util.notification.success('文章标签失效成功')
-        _this.getList()
-        _this.$store.dispatch('constant/reloadTags', true)
-      })
+      this.tagsForm = { id, name: undefined, status: this.status[0].key }
+      this.submitTags(
+        this.tagsForm,
+        () => {
+          this.$util.notification.success('文章标签失效成功')
+          this.getList()
+        },
+        '确认要失效此文章标签吗？'
+      )
     }
   }
 }

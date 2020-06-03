@@ -104,106 +104,119 @@
       </div>
     </div>
 
-    <!-- 表格 -->
-    <el-table
-      ref="table"
-      v-loading="listLoading"
-      :data="list"
-      border
-      fit
-      style="width: 100%;"
-      :default-sort="{prop: 'updateTime', order: 'descending'}"
-      @sort-change="sortChange"
-    >
-      <!-- id -->
-      <el-table-column label="ID" prop="id" align="center" width="50">
-        <template slot-scope="{ row }">
-          <span>{{ row.id }}</span>
-        </template>
-      </el-table-column>
-      <!-- 标题 -->
-      <el-table-column label="标题" min-width="150">
-        <template slot-scope="{ row }">
-          <span class="link-type">{{ row.title }}</span>
-        </template>
-      </el-table-column>
-      <!-- 分类 -->
-      <el-table-column label="分类" width="150" align="center">
-        <template slot-scope="{ row }">
-          <el-tag effect="plain">{{ row.category }}</el-tag>
-        </template>
-      </el-table-column>
-      <!-- 标签 -->
-      <el-table-column label="标签" align="center">
-        <template slot-scope="{ row }">
-          <el-tag
-            v-for="item in row.tags.split(',')"
-            :key="item"
-            type="warning"
-            effect="plain"
-          >{{ item }}</el-tag>
-        </template>
-      </el-table-column>
-      <!-- 状态 -->
-      <el-table-column label="状态" class-name="status-col" width="95">
-        <template slot-scope="{ row }">
-          <el-tag :type="row.status | statusFilter">{{ row.status | statusNameFilter }}</el-tag>
-        </template>
-      </el-table-column>
-      <!-- 时间 -->
-      <el-table-column label="发布时间" sortable="custom" prop="createTime" width="140" align="center">
-        <template slot-scope="{ row }">
-          <span>{{ row.createTime }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="修改时间" sortable="custom" prop="updateTime" width="140" align="center">
-        <template slot-scope="{ row }">
-          <span>{{ row.updateTime }}</span>
-        </template>
-      </el-table-column>//
-      <el-table-column
-        label="操作"
-        width="195"
-        style="text-align:center"
-        align="center"
-        class-name="small-padding fixed-width"
+    <div class="filter-container">
+      <!-- 表格 -->
+      <el-table
+        ref="table"
+        v-loading="listLoading"
+        :data="list"
+        border
+        fit
+        style="width: 100%;"
+        :default-sort="{prop: 'updateTime', order: 'descending'}"
+        @sort-change="sortChange"
       >
-        <template slot-scope="{ row }" align="left">
-          <div class="operation">
-            <router-link :to="'/edit/'+row.id">
+        <!-- id -->
+        <el-table-column label="ID" prop="id" align="center" width="50">
+          <template slot-scope="{ row }">
+            <span>{{ row.id }}</span>
+          </template>
+        </el-table-column>
+        <!-- 标题 -->
+        <el-table-column label="标题" min-width="150">
+          <template slot-scope="{ row }">
+            <span class="link-type">{{ row.title }}</span>
+          </template>
+        </el-table-column>
+        <!-- 分类 -->
+        <el-table-column label="分类" width="150" align="center">
+          <template slot-scope="{ row }">
+            <el-tag effect="plain">{{ row.category }}</el-tag>
+          </template>
+        </el-table-column>
+        <!-- 标签 -->
+        <el-table-column label="标签" align="center">
+          <template slot-scope="{ row }">
+            <el-tag
+              v-for="item in row.tags.split(',')"
+              :key="item"
+              type="warning"
+              effect="plain"
+            >{{ item }}</el-tag>
+          </template>
+        </el-table-column>
+        <!-- 状态 -->
+        <el-table-column label="状态" class-name="status-col" width="95">
+          <template slot-scope="{ row }">
+            <el-tag :type="row.status | statusFilter">{{ row.status | statusNameFilter }}</el-tag>
+          </template>
+        </el-table-column>
+        <!-- 时间 -->
+        <el-table-column
+          label="发布时间"
+          sortable="custom"
+          prop="createTime"
+          width="140"
+          align="center"
+        >
+          <template slot-scope="{ row }">
+            <span>{{ row.createTime }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column
+          label="修改时间"
+          sortable="custom"
+          prop="updateTime"
+          width="140"
+          align="center"
+        >
+          <template slot-scope="{ row }">
+            <span>{{ row.updateTime }}</span>
+          </template>
+        </el-table-column>//
+        <el-table-column
+          label="操作"
+          width="195"
+          style="text-align:center"
+          align="center"
+          class-name="small-padding fixed-width"
+        >
+          <template slot-scope="{ row }" align="left">
+            <div>
+              <router-link :to="'/edit/'+row.id">
+                <el-button
+                  style="margin-left:5px;"
+                  size="small"
+                  icon="el-icon-edit-outline"
+                  type="primary"
+                >编辑</el-button>
+              </router-link>
               <el-button
-                style="margin-left:5px;"
+                v-if="row.status != '1'"
                 size="small"
-                icon="el-icon-edit-outline"
-                type="primary"
-              >编辑</el-button>
-            </router-link>
-            <el-button
-              v-if="row.status != '1'"
-              size="small"
-              icon="el-icon-s-promotion"
-              type="success"
-              @click="onRelease(row.id)"
-            >发布</el-button>
-            <el-button
-              v-if="row.status == '1'"
-              size="small"
-              icon="el-icon-delete"
-              type="danger"
-              @click="onUnRelease(row.id)"
-            >取消发布</el-button>
-          </div>
-        </template>
-      </el-table-column>
-    </el-table>
-
-    <pagination
-      v-show="total > listQuery.size"
-      :total="total"
-      :page.sync="listQuery.current"
-      :limit.sync="listQuery.size"
-      @pagination="getList"
-    />
+                icon="el-icon-s-promotion"
+                type="success"
+                @click="onRelease(row.id)"
+              >发布</el-button>
+              <el-button
+                v-if="row.status == '1'"
+                size="small"
+                icon="el-icon-delete"
+                type="danger"
+                @click="onUnRelease(row.id)"
+              >取消发布</el-button>
+            </div>
+          </template>
+        </el-table-column>
+      </el-table>
+      <pagination
+        v-show="total > listQuery.size"
+        :total="total"
+        :page.sync="listQuery.current"
+        :limit.sync="listQuery.size"
+        @pagination="getList"
+      />
+    </div>
   </div>
 </template>
 
@@ -238,13 +251,10 @@ export default {
   },
   data() {
     return {
-      reload: false,
-      list: null,
+      list: [],
       tagsList: null,
       categoryList: null,
       total: 0,
-      categoryStaus: false,
-      tagsStaus: false,
       listLoading: true,
       listQuery: {
         current: 1,
@@ -279,59 +289,41 @@ export default {
       }
     }
   },
-  watch: {
-    // 新建文章跳转到文章列表会刷新，或者在 router 把 noCache false
-    '$store.getters.reloadStatus'() {
-      this.reload = this.$store.getters.reloadStatus
-    },
-    '$store.getters.tagsStaus'() {
-      this.tagsStaus = this.$store.getters.tagsStaus
-    },
-    '$store.getters.categoryStaus'() {
-      this.tagsStaus = this.$store.getters.categoryStaus
-    },
-    reload() {
-      if (this.reload) {
-        this.handleFilter()
-        this.$store.dispatch('constant/updateReload', false)
-      }
-    },
-    tagsStaus() {
-      if (this.tagsStaus) {
-        this.handleFilter()
-        this.$store.dispatch('constant/reloadTags', false)
-      }
-    },
-    categoryStaus() {
-      this.handleFilter()
-      this.$store.dispatch('constant/reloadCategory', false)
-    }
+  activated() {
+    this.handleFilter()
   },
   created() {
     this.getList()
   },
   methods: {
-    // 获取文章列表
-    getList() {
+    makeConfirm(title, action) {
+      this.$confirm(title, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
+          action()
+        })
+        .catch(() => {})
+    },
+    async getList() {
       this.listLoading = true
-      getArticleList(this.listQuery)
-        .then(res => {
-          const { list, total } = res.data
-          this.list = list
-          this.total = total
-          setTimeout(() => {
-            this.listLoading = false
-          }, 0.8 * 1000)
-        })
-        .catch(() => {
+      // 获取文章列表
+      try {
+        const { list, total } = (await getArticleList(this.listQuery)).data
+        this.list = list
+        this.total = total
+        setTimeout(() => {
           this.listLoading = false
-        })
-      tagsList().then(res => {
-        this.tagsList = res.data
-      })
-      categoryList().then(res => {
-        this.categoryList = res.data
-      })
+        }, 0.8 * 1000)
+      } catch (e) {
+        this.listLoading = false
+      }
+      // 获取标签
+      this.tagsList = (await tagsList()).data
+      // 获取分类
+      this.categoryList = (await categoryList()).data
     },
     handleFilter() {
       this.listQuery.current = 1
@@ -339,32 +331,33 @@ export default {
     },
     // 发布文章
     onRelease(id) {
-      const _this = this
-      this.updateParam.id = id
-      this.updateParam.status = this.status[1].key
-      this.submitArticle(this.updateParam, function() {
-        _this.$util.notification.success('文章发布成功！')
-        _this.handleFilter()
-      })
+      this.updateParam = { id, status: this.status[1].key }
+      this.submitArticle(
+        this.updateParam,
+        () => {
+          this.$util.notification.success('文章发布成功！')
+          this.handleFilter()
+        },
+        '确认要发布此文章吗？'
+      )
     },
     // 取消发布文章
     onUnRelease(id) {
-      const _this = this
-      this.updateParam.id = id
-      this.updateParam.status = this.status[2].key
-      this.submitArticle(this.updateParam, function() {
-        _this.$util.notification.success('文章取消发布成功！')
-        _this.handleFilter()
-      })
+      this.updateParam = { id, status: this.status[2].key }
+      this.submitArticle(
+        this.updateParam,
+        () => {
+          this.$util.notification.success('文章取消发布成功！')
+          this.handleFilter()
+        },
+        '确认要取消发布此文章吗？'
+      )
     },
-    submitArticle(data, action) {
-      saveArticle(data)
-        .then(response => {
-          action()
-        })
-        .catch(err => {
-          console.log(err)
-        })
+    submitArticle(data, action, title) {
+      this.makeConfirm(title, async() => {
+        await saveArticle(data)
+        action()
+      })
     },
     // 按着 创建时间 / 更新时间 排序
     sortChange(column) {

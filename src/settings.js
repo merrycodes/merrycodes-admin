@@ -1,5 +1,7 @@
 module.exports = {
+
   title: 'MerryCodes Admin',
+
   /**
    * @type {string | array} 'production' | ['production', 'development']
    * @description Need show err logs component.

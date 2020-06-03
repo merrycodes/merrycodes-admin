@@ -106,6 +106,25 @@ export const constantRoutes = [
     ]
   },
   {
+    path: '/auth',
+    component: Layout,
+    meta: { title: '权限', icon: 'auth' },
+    children: [
+      {
+        path: 'user',
+        component: () => import('@/views/user-list/index'),
+        name: 'User',
+        meta: { title: '用户列表', icon: 'user' }
+      },
+      {
+        path: 'role',
+        component: () => import('@/views/role-list/index'),
+        name: 'Role',
+        meta: { title: '角色管理', icon: 'role' }
+      }
+    ]
+  },
+  {
     path: '/setting',
     component: Layout,
     children: [
