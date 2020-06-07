@@ -27,7 +27,7 @@
         />
       </el-form-item>
 
-      <el-tooltip v-model="capsTooltip" content="Caps lock is On" placement="right" manual>
+      <el-tooltip v-model="capsTooltip" content="大写已经打开" placement="right" manual>
         <el-form-item prop="password">
           <span class="svg-container">
             <svg-icon icon-class="password" />
@@ -51,6 +51,9 @@
         </el-form-item>
       </el-tooltip>
 
+      <el-form-item class="checkBox">
+        <el-checkbox v-model="loginForm.remeberMe" true-label="true" false-label="false">记住我 ？</el-checkbox>
+      </el-form-item>
       <el-button
         :loading="loading"
         type="primary"
@@ -65,15 +68,18 @@
 export default {
   name: 'Login',
   data() {
+    const checkInput = value => {
+      return value === null || value === undefined || value === ''
+    }
     const validateUsername = (rule, value, callback) => {
-      if (value.trim() === null || value.trim() === undefined) {
+      if (checkInput(value.trim())) {
         callback(new Error('请输入用户名'))
       } else {
         callback()
       }
     }
     const validatePassword = (rule, value, callback) => {
-      if (value.length < 3) {
+      if (checkInput(value.trim())) {
         callback(new Error('请输入密码'))
       } else {
         callback()
@@ -82,7 +88,8 @@ export default {
     return {
       loginForm: {
         username: '',
-        password: ''
+        password: '',
+        remeberMe: 'false'
       },
       loginRules: {
         username: [{ required: true, trigger: ['blur', 'change'], validator: validateUsername }],
@@ -280,5 +287,10 @@ $light_gray: #eee;
       display: none;
     }
   }
+}
+.checkBox {
+  margin-left: 20px;
+  border: none !important;
+  background: none !important;
 }
 </style>
