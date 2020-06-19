@@ -22,3 +22,19 @@ export function getArticleList(data) {
     params: data
   })
 }
+
+export function imgUpload(data) {
+  return request({
+    url: '/article/upload',
+    method: 'post',
+    data: data,
+    headers: { 'Content-Type': 'multipart/form-data' }
+  })
+}
+
+export function imgDelete(data) {
+  return request({
+    url: '/article/' + data,
+    method: 'delete'
+  })
+}

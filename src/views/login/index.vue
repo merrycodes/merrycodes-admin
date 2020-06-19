@@ -52,7 +52,7 @@
       </el-tooltip>
 
       <el-form-item class="checkBox">
-        <el-checkbox v-model="loginForm.remeberMe" true-label="true" false-label="false">记住我 ？</el-checkbox>
+        <el-checkbox v-model="loginForm.rememberMe" true-label="true" false-label="false">记住我 ？</el-checkbox>
       </el-form-item>
       <el-button
         :loading="loading"
@@ -89,7 +89,7 @@ export default {
       loginForm: {
         username: '',
         password: '',
-        remeberMe: 'false'
+        rememberMe: 'false'
       },
       loginRules: {
         username: [{ required: true, trigger: ['blur', 'change'], validator: validateUsername }],

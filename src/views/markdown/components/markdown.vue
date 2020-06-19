@@ -16,13 +16,16 @@
           <el-form-item prop="mdContent">
             <mavon-editor
               id="md"
+              ref="md"
               v-model="blogForm.mdContent"
               :autofocus="false"
               :toolbars="toolbars"
               :code-style="'atom-one-dark'"
               :class="[zIndex ? 'full-height' : 'z-index-1']"
               class="mavonEditor"
+              :image-click="imageClick"
               @change="onChange"
+              @imgAdd="imgUpload"
               @fullScreen="mdScreenChange"
             >
               <template slot="right-toolbar-before">
@@ -134,12 +137,48 @@
         </el-col>
       </el-row>
     </el-form>
+
+    <el-dialog
+      title="操作"
+      :visible.sync="dialogVisible"
+      width="15%"
+      center
+      top="25vh"
+      :before-close="(action) => {tempEle = null; action()}"
+    >
+      <el-row type="flex" justify="center" style="margin-top: 5px; margin-bottom: 10px;">
+        <el-button
+          type="danger"
+          size="medium"
+          round
+          plain
+          icon="el-icon-delete"
+          @click="handleDelete(tempEle.alt,tempEle.src,true)"
+        >删除图片</el-button>
+      </el-row>
+      <el-row type="flex" justify="center" style="margin-top: 5px; margin-bottom: 10px;">
+        <el-button
+          type="info"
+          size="medium"
+          round
+          plain
+          icon="el-icon-search"
+          @click="previewImage(tempEle.src)"
+        >浏览图片</el-button>
+      </el-row>
+    </el-dialog>
+
+    <transition name="fade">
+      <div v-if="imageUrl" class="previewImage" @click="imageUrl=null">
+        <img :src="imageUrl" alt="none">
+      </div>
+    </transition>
   </div>
 </template>
 
 <script>
 import checkPermission from '@/utils/permission'
-import { saveArticle, getArticle } from '@/api/article'
+import { saveArticle, getArticle, imgUpload, imgDelete } from '@/api/article'
 import { tagsListByStaus } from '@/api/tags'
 import { categoryListByStaus } from '@/api/category'
 import { mavonEditor } from 'mavon-editor'
@@ -160,6 +199,9 @@ export default {
   },
   data() {
     return {
+      imageUrl: null,
+      tempEle: null,
+      dialogVisible: false,
       tagsList: null,
       categoryList: null,
       zIndex: false,
@@ -275,7 +317,13 @@ export default {
       this.$util.importMd(selectedFile, this)
     },
     addSummary() {
-      this.blogForm.mdContent += '<!-- read more -->'
+      const $vm = this.$refs.md
+      const summaryFlag = {
+        prefix: '<!-- ',
+        subfix: ' -->',
+        str: 'read more'
+      }
+      $vm.insertText($vm.getTextareaDom(), summaryFlag)
     },
     mdScreenChange(e) {
       this.zIndex = e
@@ -352,6 +400,38 @@ export default {
     },
     async getcategoryList() {
       this.categoryList = (await categoryListByStaus()).data
+    },
+    // 上床图片操作
+    async imgUpload(url, file) {
+      var formdata = new FormData()
+      formdata.append('image', file)
+      try {
+        const { message } = await imgUpload(formdata)
+        this.$refs.md.$img2Url(url, message)
+      } catch (e) {
+        this.handleDelete(file._name, url, false)
+      }
+    },
+    // 删除图片操作
+    async handleDelete(description, url, serve) {
+      this.$refs.md.$refs.toolbar_left.$imgDelByFilename(description)
+      if (serve) {
+        var key = url.substring(url.lastIndexOf('/') + 1)
+        await imgDelete(key)
+      }
+      const reg = new RegExp(`\\!\\[${description}\\]\\(${url}\\)`, 'g')
+      this.blogForm.mdContent = this.blogForm.mdContent.replace(reg, '')
+      this.dialogVisible = false
+    },
+    // 浏览图片
+    previewImage(url) {
+      this.imageUrl = url
+      this.dialogVisible = false
+    },
+    // 点击图片
+    imageClick(ele) {
+      this.dialogVisible = true
+      this.tempEle = ele
     }
   }
 }
@@ -377,8 +457,36 @@ export default {
   height: 100% !important;
 }
 
+/deep/.el-dialog--center {
+  .el-dialog__header {
+    padding: 15px 25px 0px !important;
+  }
+  .el-dialog__body {
+    // text-align: center !important;
+    padding: 5px 25px 10px !important;
+  }
+}
+
 #md {
   width: 100%;
   height: 750px;
+}
+
+.previewImage {
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 1600;
+  transition: all 0.1s linear 0s;
+  img {
+    flex: 0 0 auto;
+    z-index: 3;
+  }
 }
 </style>

@@ -13,7 +13,7 @@ export function login(data) {
       return JSON.stringify(data)
     },
     headers: {
-      'Content-Type': 'application/json;charset=UTF-8'
+      'Content-Type': 'application/json'
     }
   })
 }
