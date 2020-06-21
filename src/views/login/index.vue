@@ -19,7 +19,7 @@
         <el-input
           ref="username"
           v-model="loginForm.username"
-          placeholder="Username"
+          placeholder="请输入用户名"
           name="username"
           type="text"
           tabindex="1"
@@ -37,7 +37,7 @@
             ref="password"
             v-model="loginForm.password"
             :type="passwordType"
-            placeholder="Password"
+            placeholder="请输入密码"
             name="password"
             tabindex="2"
             autocomplete="on"
@@ -59,7 +59,7 @@
         type="primary"
         style="width:100%;margin-bottom:30px;"
         @click.native.prevent="handleLogin"
-      >Login</el-button>
+      >登录</el-button>
     </el-form>
   </div>
 </template>
@@ -224,6 +224,7 @@ $light_gray: #eee;
   width: 100%;
   background-color: $bg;
   overflow: hidden;
+  user-select: none;
 
   .login-form {
     position: relative;
