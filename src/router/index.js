@@ -1,6 +1,6 @@
-import Vue from 'vue'
 import Router from 'vue-router'
 
+// eslint-disable-next-line no-undef
 Vue.use(Router)
 
 import Layout from '@/layout'

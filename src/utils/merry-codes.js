@@ -1,5 +1,3 @@
-import { Notification } from 'element-ui'
-
 /**
  * 默认的获取文章内容标签
  */
@@ -11,7 +9,8 @@ const FUNCTIONS = {
    */
   notification: {
     success: function(message) {
-      Notification({
+      // eslint-disable-next-line no-undef
+      ELEMENT.Notification({
         title: 'success',
         message: message || '成功',
         type: 'success',
@@ -20,7 +19,8 @@ const FUNCTIONS = {
       })
     },
     warning: function(message) {
-      Notification({
+      // eslint-disable-next-line no-undef
+      ELEMENT.Notification({
         title: 'warning',
         message: message || '警告',
         type: 'warning',
@@ -29,7 +29,8 @@ const FUNCTIONS = {
       })
     },
     info: function(message) {
-      Notification({
+      // eslint-disable-next-line no-undef
+      ELEMENT.Notification({
         title: 'info',
         message: message || '提示',
         type: 'info',
@@ -38,7 +39,8 @@ const FUNCTIONS = {
       })
     },
     error: function(message) {
-      Notification({
+      // eslint-disable-next-line no-undef
+      ELEMENT.Notification({
         title: 'error',
         message: message || '异常',
         type: 'error',

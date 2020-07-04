@@ -240,19 +240,18 @@ export default {
     switchChange(row, index) {
       if (!row.enabled) {
         this.makeConfirm('确定生效此用户?', () => {
-          this.list[index].enabled = true
-          this.enableUser(row.id, row.enabled)
+          this.enableUser(row.id, !row.enabled, index)
         })
       } else {
         this.makeConfirm('确定失效此用户?', () => {
-          this.list[index].enabled = false
-          this.enableUser(row.id, row.enabled)
+          this.enableUser(row.id, !row.enabled, index)
         })
       }
     },
-    async enableUser(id, enabled) {
+    async enableUser(id, enabled, index) {
       await updateEnableUser({ id, enabled })
       this.$util.notification.success('修改成功')
+      this.list[index].enabled = enabled
       this.getList()
     },
     /**
@@ -330,6 +329,7 @@ export default {
         // eslint-disable-next-line no-unused-vars
         const { rePassword, ...data } = this.userForm
         await saveUser(data)
+        this.addUserDialog.visible = false
         this.closeDialog('添加用户成功！', this.editUserDialog)
       })
     },

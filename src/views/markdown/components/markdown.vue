@@ -361,7 +361,7 @@ export default {
           const { htmlContent } = this.blogForm
           this.submitting = true
           // 标签转换成字符串
-          this.blogForm = { tags: this.articleTag.join(), summaryContent: this.$util.getSummary(htmlContent), ...this.blogForm }
+          this.blogForm = { ...this.blogForm, tags: this.articleTag.join(), summaryContent: this.$util.getSummary(htmlContent) }
           try {
             await saveArticle(this.blogForm)
             action()

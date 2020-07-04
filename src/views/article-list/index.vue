@@ -125,7 +125,7 @@
         <!-- 标题 -->
         <el-table-column label="标题" min-width="150">
           <template slot-scope="{ row }">
-            <span class="link-type">{{ row.title }}</span>
+            <el-link :href="getUrl(row.id)" target="_blank" type="primary">{{ row.title }}</el-link>
           </template>
         </el-table-column>
         <!-- 分类 -->
@@ -226,6 +226,7 @@ import { tagsList } from '@/api/tags'
 import { categoryList } from '@/api/category'
 import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
+import settings from '@/settings'
 
 export default {
   name: 'ArticleList',
@@ -376,6 +377,13 @@ export default {
         }
         this.getList()
       }
+    },
+    getUrl(id) {
+      let blogUrl = settings.blogUrl
+      if (!blogUrl.endsWith('/')) {
+        blogUrl += '/'
+      }
+      return blogUrl + 'article/' + id
     }
   }
 }
