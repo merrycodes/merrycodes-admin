@@ -67,9 +67,9 @@ module.exports = {
       ],
       js: [
         // vue must at first!
-        'https://cdn.jsdelivr.net/npm/vue@2.6.10',
+        'https://cdn.bootcdn.net/ajax/libs/vue/2.6.10/vue.min.js',
         // element-ui js
-        'https://unpkg.com/element-ui@2.13.0/lib/index.js'
+        'https://cdn.bootcdn.net/ajax/libs/element-ui/2.13.0/index.js'
       ]
     }
     config.plugin('html').tap(args => {

@@ -144,11 +144,22 @@ export const constantRoutes = [
  */
 export const asyncRoutes = [
   {
+    path: 'druid-monitor',
+    component: Layout,
+    meta: { roles: ['ADMIN'] },
+    children: [
+      {
+        path: 'http://admin.merrycodes.com/api/druid',
+        meta: { title: 'Druid 监控', icon: 'monitor' }
+      }
+    ]
+  },
+  {
     path: 'external-link',
     component: Layout,
     children: [
       {
-        path: 'https://github.com/PanJiaChen/vue-element-admin',
+        path: 'https://github.com/merrycodes/merrycodes-admin',
         meta: { title: 'External Link', icon: 'link' }
       }
     ]

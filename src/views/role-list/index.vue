@@ -106,6 +106,9 @@ export default {
       }
     }
   },
+  activated() {
+    this.getList()
+  },
   created() {
     this.getList()
   },
