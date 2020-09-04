@@ -338,8 +338,14 @@ export default {
      */
     async delecteUser(id) {
       this.makeConfirm('确认删除此用户吗？', async() => {
-        await removeUser(id)
-        this.closeDialog('删除用户成功！', this.editUserDialog)
+        // 如果删除的是当前登录用户
+        if ((await removeUser(id)).data) {
+          await this.$store.dispatch('user/logout')
+          this.$router.push(`/login?redirect=${this.$route.fullPath}`)
+          this.$util.notification.success('已删除当前登录用户，请重新登录！')
+        } else {
+          this.closeDialog('删除用户成功！', this.editUserDialog)
+        }
       })
     },
     /**

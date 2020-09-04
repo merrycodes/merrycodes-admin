@@ -24,6 +24,7 @@
               :class="[zIndex ? 'full-height' : 'z-index-1']"
               class="mavonEditor"
               :image-click="imageClick"
+              :xss-options="xssOptions"
               @change="onChange"
               @imgAdd="imgUpload"
               @fullScreen="mdScreenChange"
@@ -207,6 +208,8 @@ export default {
       zIndex: false,
       articleTag: [],
       submitting: false,
+      // 防止XSS攻击，配置参考：https://github.com/leizongmin/js-xss/blob/master/README.zh.md
+      xssOptions: [],
       // 表单数据
       blogForm: {
         id: '',
