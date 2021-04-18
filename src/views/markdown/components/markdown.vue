@@ -180,8 +180,8 @@
 <script>
 import checkPermission from '@/utils/permission'
 import { saveArticle, getArticle, imgUpload, imgDelete } from '@/api/article'
-import { tagsListByStaus } from '@/api/tags'
-import { categoryListByStaus } from '@/api/category'
+import { tagsListByStatus } from '@/api/tags'
+import { categoryListByStatus } from '@/api/category'
 import { mavonEditor } from 'mavon-editor'
 import MDinput from '@/components/MDinput'
 import 'mavon-editor/dist/css/index.css'
@@ -399,10 +399,10 @@ export default {
       document.title = `${title} - ${this.blogForm.id}`
     },
     async getTagsList() {
-      this.tagsList = (await tagsListByStaus()).data
+      this.tagsList = (await tagsListByStatus()).data
     },
     async getcategoryList() {
-      this.categoryList = (await categoryListByStaus()).data
+      this.categoryList = (await categoryListByStatus()).data
     },
     // 上床图片操作
     async imgUpload(url, file) {

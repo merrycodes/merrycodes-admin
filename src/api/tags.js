@@ -23,9 +23,9 @@ export function tagsList() {
   })
 }
 
-export function tagsListByStaus() {
+export function tagsListByStatus() {
   return request({
-    url: '/tags/stausList',
+    url: '/tags/statusList',
     method: 'get'
   })
 }

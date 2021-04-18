@@ -23,9 +23,9 @@ export function categoryList() {
   })
 }
 
-export function categoryListByStaus() {
+export function categoryListByStatus() {
   return request({
-    url: '/category/stausList',
+    url: '/category/statusList',
     method: 'get'
   })
 }
